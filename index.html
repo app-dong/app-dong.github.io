@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>دونگ</title>
+<script src="config.js"></script>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#242850">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1b1f27;--mut:#6b7380;--bd:#eceff3;--ac2:#b7791f;--tint:#eef0ff;--ac:#2f6df6;--acx:#fff;--ok:#16a34a;--no:#dc2626;--pv:#b45309;--pvb:#fef3c7;--pb:#dcfce7;--pt:#166534;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161a;--card:#1d2026;--tx:#eceef2;--mut:#9aa3b0;--bd:#282d36;--ac2:#f6c453;--tint:#242850;--ac:#5b8cff;--acx:#0b1020;--ok:#4ade80;--no:#f87171;--pv:#fcd34d;--pvb:#3a2e0a;--pb:#10301c;--pt:#86efac}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Vazirmatn,Tahoma,system-ui,sans-serif;line-height:1.7}
+.w{max-width:640px;margin:0 auto;padding:16px 16px 90px}
+h1{font-size:22px;margin:4px 0 2px}h2{font-size:18px;font-weight:800;text-align:center;margin:0 0 12px;background:var(--tint);color:var(--ac2);border-radius:10px;padding:9px 12px}
+.sub{color:var(--mut);font-size:13px;margin-bottom:14px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+input[type=text],select{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;margin-bottom:8px}
+.r{display:flex;gap:8px}.r>*{flex:1}.r>button{flex:0 0 auto}
+button{font:inherit;border:0;border-radius:10px;padding:10px 16px;background:var(--ac);color:var(--acx);cursor:pointer;font-weight:600}
+button.g{background:transparent;color:var(--mut);padding:4px 8px;font-weight:400}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chip{border:1px solid var(--bd);border-radius:20px;padding:4px 12px;font-size:14px;cursor:pointer;user-select:none;background:var(--bg)}
+.chip.on{background:var(--ac);color:var(--acx);border-color:var(--ac)}
+.seg{display:flex;border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.seg div{flex:1;text-align:center;padding:8px;cursor:pointer;font-size:14px}
+.seg .on{background:var(--ac);color:var(--acx);font-weight:600}
+.lab{font-size:13px;color:var(--mut);margin:4px 0}
+.row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--bd);gap:8px}
+.row:first-of-type{border-top:0}
+.b{font-size:11px;border-radius:8px;padding:1px 8px;margin-inline-start:6px}
+.b.pu{background:var(--pb);color:var(--pt)}.b.pr{background:var(--pvb);color:var(--pv)}
+.pos{color:var(--ok);font-weight:600}.neg{color:var(--no);font-weight:600}
+.s{font-size:12px;color:var(--mut)}.err{color:var(--no);margin-top:4px}
+.msg{text-align:center;color:var(--mut);padding:30px 10px}
+.sh{display:flex;align-items:center;gap:8px}.sh span{flex:1}.sh input{margin:0;flex:1;min-width:90px}.sh .plus{flex:0 0 auto;padding:6px 10px}.pv{margin:-2px 0 6px}input:focus,textarea:focus{outline:2px solid var(--ac)}#fab{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));inset-inline-end:18px;width:56px;height:56px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(0,0,0,.28);z-index:40}body.kp #fab{display:none!important}#kp{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);border-top:1px solid var(--bd);padding:6px 10px calc(8px + env(safe-area-inset-bottom,0px))}.kh{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;max-width:520px;margin-inline:auto}.kg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;direction:ltr;max-width:520px;margin:0 auto}.kg button{height:46px;font-size:20px;padding:0;background:var(--bg);color:var(--tx);border:1px solid var(--bd)}.kg button.o{color:var(--ac)}.kg button.cc{color:var(--no)}.xb{flex:1;width:100%;min-height:42px;padding:9px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;line-height:1.7;resize:none;overflow:hidden;margin:0}.cr{display:inline-block;width:2px;height:1.15em;background:var(--ac);vertical-align:text-bottom;margin:0 -1px;animation:bl 1s steps(1) infinite}@keyframes bl{50%{opacity:0}}.xb i{font-style:normal}body.kp{padding-bottom:320px}
+.ah{position:relative;display:flex;justify-content:center;align-items:center;cursor:pointer;font-weight:800;font-size:18px;background:var(--tint);color:var(--ac2);border-radius:10px;padding:10px 40px}.ar{position:absolute;inset-inline-end:12px;top:50%;margin-top:-8px;display:flex;opacity:.85;transition:transform .2s}.ah.open .ar{transform:rotate(180deg)}.ar2{display:inline-flex;vertical-align:middle;color:var(--mut);transition:transform .2s}.ar2.open{transform:rotate(180deg)}.ab{margin-top:12px}.acc{padding:12px 14px}.det{background:var(--bg);border-radius:10px;padding:10px 12px;margin:0 0 8px;font-size:14px}.det .row{padding:4px 0}
+</style>
+</head>
+<body>
+<div class="w" id="app"><div class="msg">در حال بارگذاری…</div></div>
+<script type="module">
+// ---- adapter: the app talks to a small PHP/MySQL API on your host (live updates by polling every 3s) ----
+const API=window.DONG_API||'';
+const live=/^https?:\/\//.test(API)&&!/YOUR/i.test(API);
+let UID=null;try{UID=localStorage.getItem('dong_uid');if(!UID){UID=[...crypto.getRandomValues(new Uint8Array(16))].map(x=>x.toString(16).padStart(2,'0')).join('');localStorage.setItem('dong_uid',UID)}}catch(e){}
+const post=async b=>{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(b)});const j=await r.json();if(!r.ok||j.error)throw new Error(j.error||'http');return j};
+const split=p=>{const i=p.lastIndexOf('/');return [p.slice(0,i),p.slice(i+1)]};
+const ws=j=>({docs:j.docs.map(d=>({id:d.id,data:()=>d.data,pending:false})),empty:!j.docs.length,metadata:{fromCache:false}});
+const subs=new Map();let seq=0,timer=null,inflight=false,again=false;
+async function tick(){if(inflight){again=true;return}if(!subs.size||document.hidden)return;inflight=true;
+  try{const arr=[...subs.values()],j=await post({op:'poll',subs:arr.map(s=>({col:s.col,v:s.v}))});
+    (j.changes||[]).forEach(c=>{const s=arr[c.i];if(s&&subs.has(s.id)){s.v=c.v;s.cb(ws({docs:c.docs}))}})}catch(e){}
+  inflight=false;if(again){again=false;tick()}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
+const w=async o=>{const r=await post(o);setTimeout(tick,30);return r};
+const dbx=live&&{collection:p=>({
+    onSnapshot:(n,e)=>{const s={id:++seq,col:p,v:null,cb:n};subs.set(s.id,s);if(!timer)timer=setInterval(tick,3000);tick();return()=>{subs.delete(s.id)}},
+    add:o=>w({op:'set',col:p,id:Date.now().toString(36)+Math.random().toString(36).slice(2,10),data:o}),
+    get:async()=>ws(await post({op:'list',col:p}))}),
+  doc:p=>{const [c,i]=split(p);return {get:async()=>{const j=await post({op:'get',col:c,id:i});return{exists:!!j.exists,data:()=>j.data,id:i}},
+    set:o=>w({op:'set',col:c,id:i,data:o}),update:o=>w({op:'update',col:c,id:i,data:o}),delete:()=>w({op:'delete',col:c,id:i})}}};
+const claude={use:async n=>{if(!dbx||!UID)return null;return n==='db'?dbx:{id:async()=>UID}}};
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const en=s=>String(s).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+const fd=s=>String(s).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const fa=n=>Math.round(n).toLocaleString('fa-IR');
+const toNum=s=>Number(en(s).replace(/[^0-9]/g,''))||0;
+const rid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+const pad=n=>String(n).padStart(2,'0');
+function today(){const p={};new Intl.DateTimeFormat('en-u-ca-persian-nu-latn',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).forEach(x=>p[x.type]=x.value);return p.year+'/'+p.month+'/'+p.day}
+function normDate(v){const m=en(v).trim().replace(/[-.]/g,'/').match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);if(!m)return null;const mo=+m[2],d=+m[3];return mo<1||mo>12||d<1||d>31?null:m[1]+'/'+pad(mo)+'/'+pad(d)}
+const tm=n=>fa(n)+' تومان';
+const CH='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+function calc(s){s=en(s).replace(/[٬,،\s]/g,'').replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+  if(!s||!/^[0-9+\-*/().%]+$/.test(s))return NaN;let i=0,pf=false;
+  // x+y% means x+(x*y%) ; x*y% and x/y% use plain y/100
+  const un=()=>{pf=false;let v;if(s[i]==='-'){i++;return -un()}
+    if(s[i]==='('){i++;v=add();if(s[i]!==')')throw 0;i++}
+    else{const j=i;while(/[0-9.]/.test(s[i]||''))i++;if(j===i)throw 0;v=parseFloat(s.slice(j,i))}
+    if(s[i]==='%'){i++;v/=100;pf=true}else pf=false;return v};
+  const mul=()=>{let v=un(),one=pf;while(s[i]==='*'||s[i]==='/'){const o=s[i++],r=un();v=o==='*'?v*r:v/r;one=false}pf=one;return v};
+  const add=()=>{let v=mul();while(s[i]==='+'||s[i]==='-'){const o=s[i++];let r=mul();if(pf)r=v*r;v=o==='+'?v+r:v-r;pf=false}return v};
+  try{const v=add();return i===s.length&&isFinite(v)?Math.round(v):NaN}catch(e){return NaN}}
+let db,myId=null,P=[],cur=null,unsub=null,view='home',HS={};
+let st={payer:'',sel:{},mode:'equal',cust:{},ex:{},car:{},edit:null,cl:0,auto:null,open:null};
+const pcol=()=>'data/users/'+myId;
+const pc=()=>db.collection(pcol());
+// offline outbox: writes that cannot reach the server are kept in this browser and re-sent when online
+const OB='dong_ob';let OBQ=[];try{OBQ=JSON.parse(localStorage.getItem(OB)||'[]')}catch(e){}
+const obSave=()=>{try{localStorage.setItem(OB,JSON.stringify(OBQ))}catch(e){}};
+const tmo=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r('timeout'),ms))]);
+const transient=e=>e==='timeout'||(e&&e.code==='unavailable');
+function banner(){const n=$('obn');if(!n)return;const c=(cur&&cur.entries?cur.entries.filter(e=>e._pending).length:0)+OBQ.length;n.style.display=c?'':'none';n.textContent=c?'⏳ '+fa(c)+' مورد ارسال نشده؛ با برقراری اینترنت خودکار ارسال می‌شود.':''}
+let flushing=false;
+async function flush(){if(flushing||!OBQ.length||!db)return;flushing=true;
+  while(OBQ.length){try{await tmo(db.doc(OBQ[0].path).set(OBQ[0].data),10000);OBQ.shift();obSave()}catch(e){if(transient(e))break;OBQ.shift();obSave()}}
+  flushing=false;banner();if(view==='group'&&cur)renderParts()}
+window.addEventListener('online',flush);setInterval(flush,15000);
+document.addEventListener('focusin',e=>{if(st.focus&&!e.target.closest('#shr')&&!e.target.closest('#kp'))closeKp()});
+(async function init(){
+  db=await claude.use('db');const user=await claude.use('user');
+  try{myId=user?await user.id():null}catch(e){}
+  if(!db||!myId){$('app').innerHTML='<div class="msg">اتصال به سرور برقرار نشد. اینترنت و آدرس api در فایل config.js را بررسی کنید.</div>';return}
+  homeShell();flush();
+  pc().onSnapshot(s=>{P=s.docs.map(d=>({...d.data(),_d:d.id}));if(view==='home'){syncSubs();renderHome()}else if(cur&&P.some(x=>x._d===cur.pid))renderParts()},()=>{});
+})();
+function armed(b,fn){let t;b.onclick=()=>{if(b.dataset.a){clearTimeout(t);fn();return}b.dataset.a=1;const o=b.textContent;b.textContent='مطمئنی؟';t=setTimeout(()=>{delete b.dataset.a;b.textContent=o},3000)}}
+const joinedList=()=>{const d=new Set(P.filter(e=>e.t==='del').map(e=>e.ref));return P.filter(e=>e.t==='joined'&&e.v===2&&!d.has(e.id)).sort((a,b)=>b.at-a.at)};
+const rc=()=>String(1000+Math.floor(Math.random()*9000));
+async function freeCode(){for(let k=0;k<40;k++){const c=rc();if(!(await db.doc('codes/'+c).get()).exists)return c}throw 0}
+function build(es){es=es.slice().sort((a,b)=>a.at-b.at);const d=new Set(es.filter(e=>e.t==='del').map(e=>e.ref)),meta=es.find(e=>e.t==='meta'),lk=es.filter(e=>e.t==='lock').pop(),cl={};es.filter(e=>e.t==='claim').forEach(c=>cl[c.pid]=c.by);
+  return {people:es.filter(e=>e.t==='person'&&!d.has(e.id)),exps:es.filter(e=>e.t==='exp'&&!d.has(e.id)),pays:es.filter(e=>e.t==='pay'&&!d.has(e.id)),name:meta&&meta.name,vc:meta&&meta.vc,ac:meta&&meta.ac,locked:!!(lk&&lk.v),claims:cl}}
+function balances(m){const b={};m.people.forEach(p=>b[p.id]=0);m.exps.forEach(e=>{if(!(e.payer in b))return;b[e.payer]+=e.amount;Object.entries(e.shares||{}).forEach(([i,v])=>{if(i in b)b[i]-=v})});(m.pays||[]).forEach(p=>{if(p.from in b)b[p.from]+=p.amount;if(p.to in b)b[p.to]-=p.amount});return b}
+const balTxt=v=>Math.abs(v)<0.5?'<span>تسویه‌شده ✓</span>':v>0?`<span class="pos">بستانکار ${tm(v)}</span>`:`<span class="neg">بدهکار ${tm(-v)}</span>`;
+
+// ----- home: one live summary per group -----
+function stopSubs(){Object.values(HS).forEach(h=>h.u());HS={}}
+function syncSubs(){const gs=joinedList(),keep=new Set(gs.map(g=>g.gid));
+  Object.keys(HS).forEach(k=>{if(!keep.has(k)){HS[k].u();delete HS[k]}});
+  gs.forEach(g=>{if(HS[g.gid])return;const h=HS[g.gid]={es:null,u:null};
+    h.u=db.collection('gx_'+g.gid).onSnapshot(s=>{
+      if(s.empty&&!s.metadata.fromCache){P.filter(x=>x.gid===g.gid).forEach(x=>db.doc(pcol()+'/'+x._d).delete().catch(()=>{}));return}
+      h.es=s.docs.map(d=>d.data());if(view==='home')renderHome()},()=>{})})}
+function homeShell(){document.body.classList.remove('kp');view='home';cur=null;if(unsub){unsub();unsub=null}
+  $('app').innerHTML=`<h1>🧾 دونگ</h1>
+  <div class="c"><h2>گروه‌های من</h2><div id="gl"></div></div>
+  <div class="c"><h2>ساخت گروه جدید</h2><div class="r"><input type="text" id="gn" placeholder="نام گروه (مثلاً سفر شمال)"><button id="g1">ساخت</button></div><div class="s err" id="e1"></div></div>
+  <div class="c"><h2>ورود با کد</h2><div class="r"><input type="text" id="jc" dir="ltr" inputmode="numeric" maxlength="4" placeholder="کد ۴ رقمی"><button id="g3">ورود</button></div><div class="s err" id="e2"></div></div>`;
+  $('g1').onclick=mkGroup;$('g3').onclick=joinGroup;syncSubs();renderHome()}
+function renderHome(){const L=$('gl');if(!L)return;const gs=joinedList();
+  L.innerHTML=gs.length?gs.map(g=>{const h=HS[g.gid];let sm='…';
+    if(h&&h.es){const m=build(h.es);sm=g.me&&m.people.some(p=>p.id===g.me)?balTxt(balances(m)[g.me]):'<span>برای دیدن بدهی/طلب، نام خود را در گروه انتخاب کنید</span>'}
+    return `<div class="row" style="cursor:pointer" data-id="${esc(g._d)}"><div><b>${esc(g.name)}</b>${g.role==='admin'?'<span class="b pu">👑 ادمین</span>':''}<div class="s">${sm}</div></div><span class="s">باز کردن ←</span></div>`}).join(''):'<div class="s">هنوز عضو گروهی نیستید.</div>';
+  L.querySelectorAll('.row').forEach(r=>r.onclick=()=>openGroup(gs.find(x=>x._d===r.dataset.id)))}
+let busy=false;
+const setBtn=(id,on,t)=>{const b=$(id);if(b){b.disabled=on;if(t)b.textContent=t}};
+async function mkGroup(){if(busy)return;const n=$('gn').value.trim(),e=$('e1');e.style.color='';e.textContent='';if(!n)return e.textContent='نام گروه را بنویسید.';
+  busy=true;setBtn('g1',true,'در حال ساخت…');e.style.color='var(--mut)';e.textContent='در حال ساخت گروه، چند لحظه صبر کنید…';
+  try{const gid=rid(),vc=await freeCode();await db.doc('codes/'+vc).set({gid});
+    await db.collection('gx_'+gid).add({t:'meta',name:n,vc,owner:myId,at:Date.now()});
+    await pc().add({t:'joined',v:2,id:rid(),gid,role:'admin',name:n,at:Date.now()});
+    if($('gn'))$('gn').value='';e.textContent=''}
+  catch(x){e.style.color='';e.textContent='ساخت گروه ممکن نشد (دسترسی ویرایش لازم است).'}
+  busy=false;setBtn('g1',false,'ساخت')}
+async function joinGroup(){if(busy)return;const e=$('e2');e.style.color='';e.textContent='';const c=en($('jc').value).replace(/\D/g,'');if(c.length!==4)return e.textContent='کد باید ۴ رقم باشد.';
+  busy=true;setBtn('g3',true,'…');
+  try{const d=await db.doc('codes/'+c).get();if(!d.exists)throw 'bad';
+    const gid=d.data().gid;if(joinedList().some(x=>x.gid===gid))throw 'dup';
+    const s=await db.collection('gx_'+gid).get();if(s.empty)throw 'bad';const m=s.docs.map(x=>x.data()).find(x=>x.t==='meta');
+    await pc().add({t:'joined',v:2,id:rid(),gid,role:'member',name:m?m.name:'گروه',at:Date.now()});if($('jc'))$('jc').value=''}
+  catch(x){e.textContent=x==='dup'?'قبلاً عضو این گروه هستید.':x==='bad'?'کد نامعتبر است.':'ورود ممکن نشد.'}
+  busy=false;setBtn('g3',false,'ورود')}
+
+// ----- group -----
+function openGroup(g){stopSubs();
+  const tok={pid:g._d,name:g.name,gid:g.gid,role:g.role,entries:[]};
+  cur=tok;st={payer:'',sel:{},mode:'equal',cust:{},ex:{},car:{},edit:null,cl:0,auto:null,open:null};groupShell();
+  unsub=db.collection('gx_'+g.gid).onSnapshot(s=>{if(cur!==tok)return;tok.entries=s.docs.map(d=>({...d.data(),_d:d.id,_pending:d.pending?1:0}));renderParts()},()=>{})}
+const adm=()=>cur&&cur.role==='admin';
+const model=()=>{const have=new Set(cur.entries.map(e=>e.id)),pend=OBQ.filter(x=>x.gid===cur.gid&&!have.has(x.data.id)).map(x=>({...x.data,_pending:1})),m=build(cur.entries.concat(pend));m.name=m.name||cur.name;return m};
+async function put(o){o.at=Date.now();if(!o.id)o.id=rid();const path='gx_'+cur.gid+'/'+o.id,q=()=>{OBQ.push({path,gid:cur.gid,data:o});obSave();banner();renderParts()};
+  try{await tmo(db.doc(path).set(o),7000)}catch(e){if(transient(e))q();else throw e}}
+const sec=(k,id,t,b,open)=>`<div class="c acc" id="${id}"><div class="ah${open?' open':''}"><span>${t}</span><span class="ar">${CH}</span></div><div class="ab" style="display:${open?'':'none'}">${b}</div></div>`;
+async function wipe(gid){const s=await db.collection('gx_'+gid).get(),cd=[];
+  s.docs.forEach(d=>{const x=d.data();if(x.t==='meta')cd.push(x.vc,x.ac)});
+  await Promise.all([...s.docs.map(d=>db.doc('gx_'+gid+'/'+d.id).delete()),...cd.filter(Boolean).map(c=>db.doc('codes/'+c).delete())]);
+  const g=await db.collection('gm_'+gid).get();await Promise.all(g.docs.map(d=>db.doc('gm_'+gid+'/'+d.id).delete()))}
+async function leaveGroup(){try{const J=P.find(x=>x._d===cur.pid)||{};if(J.me)await db.doc('gx_'+cur.gid+'/claim_'+J.me).delete().catch(()=>{});await db.doc(pcol()+'/'+cur.pid).delete()}catch(e){}homeShell()}
+async function removeGroup(){try{const gid=cur.gid,pid=cur.pid;await wipe(gid);await db.doc(pcol()+'/'+pid).delete()}catch(e){}homeShell()}
+
+function groupShell(){view='group';
+  $('app').innerHTML=`<div class="sh"><button class="g" id="bk">→ بازگشت</button><span></span><button class="g" id="dg">حذف گروه</button></div>
+  <h1 id="gt"></h1><div class="sub" id="rl"></div><div id="mine" style="margin:-8px 0 14px"></div><div id="obn" class="s" style="display:none;text-align:center;margin:-6px 0 12px;color:var(--pv)"></div>`+
+  sec('s','ss','تسویه حساب',`<div id="bal"></div><div id="set"></div><div style="text-align:center;margin-top:6px"><button class="g" id="payx">+ ثبت پرداخت دلخواه</button></div>
+  <div id="payf" style="display:none"><div class="lab">چه کسی پرداخت کرد</div><select id="pf"></select><div class="lab">به چه کسی</div><select id="pt"></select><input type="text" id="pa" inputmode="numeric" placeholder="مبلغ (تومان)"><button id="pgo" style="width:100%">ثبت پرداخت</button><div class="s err" id="perr"></div></div>`,true)+
+  sec('m','sm','اعضا',`<div class="lab">شما کدام عضو هستید؟</div><select id="me"></select>
+  <div class="chips" id="plist"></div><div class="r" id="addp"><input type="text" id="pn" placeholder="نام عضو جدید"><button id="addP">افزودن</button></div>
+  <button id="lockb" style="width:100%;margin-top:4px">✓ تایید نهایی اعضا</button><button class="g" id="unlk" style="display:none">باز کردن قفل اعضا</button>`)+
+  sec('l','sl','هزینه‌ها','<div id="list"></div>')+
+  sec('c','sc','کد دعوت',`<div class="r"><input type="text" id="cv" dir="ltr" readonly><button id="cpv">کپی</button></div><div class="s">لینک این صفحه + این کد را برای دوستان بفرستید.</div>`)+
+  sec('f','sf','ثبت هزینه',`<div id="editb" class="s" style="display:none;color:var(--pv);margin-bottom:8px">✏️ در حال ویرایش هزینه — <button class="g" id="cancelE">انصراف</button></div><input type="text" id="tt" placeholder="بابت (مثلاً شام)">
+  <div class="r"><input type="text" id="am" inputmode="numeric" placeholder="مبلغ (تومان)"><input type="text" id="dt" dir="ltr" value="${fd(today())}"></div>
+  <div class="lab">پرداخت‌کننده</div><select id="py"></select>
+  <div class="lab">سهیم‌ها</div><div class="chips" id="pp"></div>
+  <div class="seg" id="mseg"><div data-m="equal" class="on">تقسیم مساوی</div><div data-m="custom">مبلغ دلخواه</div></div>
+  <div id="shr"></div><button id="addE" style="width:100%">ثبت هزینه</button><div class="s err" id="err"></div>`);
+  document.querySelectorAll('.ah').forEach(h=>h.onclick=()=>{const b=h.nextElementSibling,o=b.style.display==='none';b.style.display=o?'':'none';h.classList.toggle('open',o)});
+  $('app').insertAdjacentHTML('beforeend',KP+FAB);$('kp').querySelectorAll('button').forEach(b=>{b.onmousedown=e=>e.preventDefault();b.onclick=()=>b.dataset.k==='ok'?closeKp():kpKey(b.dataset.k)});
+  $('fab').onclick=()=>{const sf=$('sf');sf.querySelector('.ab').style.display='';sf.querySelector('.ah').classList.add('open');sf.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>{const t=$('tt');if(t)t.focus({preventScroll:true})},400)};
+  try{new IntersectionObserver(es=>{$('fab').style.display=es[0].isIntersecting?'none':''},{threshold:.15}).observe($('sf'))}catch(e){}
+  $('bk').onclick=homeShell;armed($('dg'),()=>adm()?removeGroup():leaveGroup());
+  const cp=(i,b)=>$(b).onclick=()=>{$(i).select();try{navigator.clipboard.writeText($(i).value)}catch(e){try{document.execCommand('copy')}catch(x){}}$(b).textContent='کپی شد'};
+  cp('cv','cpv');
+  $('addP').onclick=addPerson;$('pn').onkeydown=e=>{if(e.key==='Enter')addPerson()};$('addE').onclick=addExp;$('cancelE').onclick=resetForm;
+  $('payx').onclick=()=>{const f=$('payf');f.style.display=f.style.display==='none'?'':'none'};
+  const pa=$('pa');pa.oninput=()=>{pa.value=plain(toNum(pa.value))};pa.onfocus=()=>{pa.value=plain(toNum(pa.value))};pa.onblur=()=>{pa.value=unit(toNum(pa.value))};
+  $('pgo').onclick=async()=>{const f=$('pf').value,t=$('pt').value,a=toNum(pa.value),er=$('perr');er.textContent='';
+    if(!f||!t||f===t)return er.textContent='پرداخت‌کننده و گیرنده را درست انتخاب کنید.';if(!a)return er.textContent='مبلغ را وارد کنید.';
+    try{await put({t:'pay',id:rid(),from:f,to:t,amount:a,date:today()});pa.value='';$('payf').style.display='none'}catch(e){er.textContent='ثبت ممکن نشد.'}};
+  const lock=v=>db.doc('gx_'+cur.gid+'/lock').set({t:'lock',v,at:Date.now()}).catch(()=>{});
+  $('lockb').onclick=()=>lock(true);$('unlk').onclick=()=>lock(false);
+  $('me').onchange=async e=>{const v=e.target.value,J=P.find(x=>x._d===cur.pid)||{},old=J.me,cp=k=>'gx_'+cur.gid+'/claim_'+k;
+    try{if(v){const d=await db.doc(cp(v)).get();if(d.exists&&d.data().by!==myId){renderParts();return}await db.doc(cp(v)).set({t:'claim',pid:v,by:myId,at:Date.now()})}
+      if(old&&old!==v)await db.doc(cp(old)).delete();await db.doc(pcol()+'/'+cur.pid).update({me:v||null})}catch(x){}};
+  const am=$('am');am.oninput=()=>{am.value=plain(toNum(am.value));fill()};am.onfocus=()=>{am.value=plain(toNum(am.value))};am.onblur=()=>{am.value=unit(toNum(am.value))};
+  $('py').onchange=e=>st.payer=e.target.value;
+  document.querySelectorAll('#mseg div').forEach(d=>d.onclick=()=>{st.mode=d.dataset.m;st.auto=null;document.querySelectorAll('#mseg div').forEach(x=>x.classList.toggle('on',x===d));renderShares()});
+  $('gt').textContent=cur.name}
+async function addPerson(){const n=$('pn').value.trim();if(!n)return;
+  if(model().people.some(p=>p.name===n))return;$('pn').value='';try{await put({t:'person',id:rid(),name:n})}catch(e){}}
+const sel=m=>m.people.filter(p=>st.sel[p.id]!==false).map(p=>p.id);
+const unit=n=>n>0?fa(n)+' تومان':'';
+const plain=n=>n>0?n.toLocaleString('fa-IR'):'';
+const pretty=e=>e.replace(/\d+/g,n=>fa(+n)).replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−');
+function rowVal(id){let e=(st.ex[id]||'').replace(/[+\-*/(]+$/,'');const o=(e.match(/\(/g)||[]).length-(e.match(/\)/g)||[]).length;if(o>0)e+=')'.repeat(o);if(!e)return 0;const v=calc(e);return isNaN(v)?0:Math.max(v,0)}
+function remain(){const r=$('rem');if(!r||st.mode!=='custom')return;const m=model(),t=sel(m).reduce((a,i)=>a+(st.cust[i]||0),0),d=toNum($('am').value)-t;
+  r.textContent=d===0?'✓ مجموع سهم‌ها برابر مبلغ است':(d>0?'باقی‌مانده: ':'اضافه: ')+tm(Math.abs(d));r.className='s '+(d===0?'pos':'neg')}
+// if exactly one person is left empty, they automatically get the whole remainder
+function fill(){if(st.mode!=='custom'||!$('shr'))return;const m=model(),ids=sel(m),amt=toNum($('am').value);
+  const man=ids.filter(i=>i!==st.auto&&st.cust[i]>0),emp=ids.filter(i=>!man.includes(i));
+  const setv=(i,v)=>{st.cust[i]=v;st.ex[i]=v>0?String(v):'';delete st.car[i];showRow(i)};
+  if(amt&&emp.length===1&&man.length===ids.length-1){st.auto=emp[0];setv(emp[0],Math.max(amt-man.reduce((a,j)=>a+st.cust[j],0),0))}
+  else if(st.auto){setv(st.auto,0);st.auto=null}
+  remain()}
+function renderShares(){const m=model(),h=$('shr');if(!h)return;
+  if(st.mode!=='custom'){h.innerHTML='';closeKp();return}
+  h.innerHTML='<div class="s" style="margin-bottom:6px">روی کادر هر نفر بزنید و با صفحه‌کلید پایین صفحه محاسبه کنید.</div>'+
+   sel(m).map(i=>`<div class="sh"><span style="flex:0 0 60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(m.people.find(p=>p.id===i).name)}</span><textarea class="xb" rows="1" inputmode="none" spellcheck="false" autocomplete="off" data-id="${esc(i)}" placeholder="سهم (تومان)"></textarea></div><div class="s pv" data-pv="${esc(i)}"></div>`).join('')+'<div id="rem" class="s" style="margin-bottom:8px"></div>';
+  h.querySelectorAll('.xb').forEach(x=>{const id=x.dataset.id;x.onfocus=()=>{if(st.focus!==id||$('kp').style.display==='none')openKp(id)};x.onbeforeinput=e=>e.preventDefault();x.onpaste=e=>e.preventDefault();x.oncut=e=>e.preventDefault();showRow(id)});
+  if(st.focus&&!sel(m).includes(st.focus))closeKp();
+  fill()}
+function disp(e){let t='',run={},k=0,m=[0];
+  while(k<e.length){if(/\d/.test(e[k])){let j=k;while(j<e.length&&/\d/.test(e[j]))j++;for(let q=k;q<j;q++)run[q]=j-q;k=j}else k++}
+  for(let i=0;i<e.length;i++){const ch=e[i];t+=/\d/.test(ch)?'۰۱۲۳۴۵۶۷۸۹'[ch]:({'*':'×','/':'÷','-':'−'}[ch]||ch);m[i+1]=t.length;if(run[i]>1&&(run[i]-1)%3===0)t+='٬'}
+  return {t,m}}
+const rawIdx=(t,pos)=>t.slice(0,pos).replace(/٬/g,'').length;
+const fit=x=>{x.style.height='auto';x.style.height=(x.scrollHeight+2)+'px'};
+const rowEl=id=>document.querySelector('#shr .xb[data-id="'+id+'"]');
+function showRow(id){const x=rowEl(id);if(!x)return;const e=st.ex[id]||'',foc=st.focus===id;let v;
+  if(!foc&&/^\d+$/.test(e)){v=unit(+e);x.dir='rtl';x.style.textAlign='right'}else{v=disp(e).t;x.dir='ltr';x.style.textAlign='left'}
+  if(x.value!==v)x.value=v;fit(x);
+  const p=document.querySelector('#shr [data-pv="'+id+'"]');if(p)p.textContent=e?'= '+tm(rowVal(id)):''}
+function openKp(id){const old=st.focus;st.focus=id;if(old&&old!==id)showRow(old);
+  const x=rowEl(id),before=x?x.value:'';showRow(id);const m=model(),p=m.people.find(q=>q.id===id);
+  $('kpn').textContent='سهم '+(p?p.name:'');$('kp').style.display='';document.body.classList.add('kp');
+  if(x&&x.value!==before){const n=x.value.length;try{x.setSelectionRange(n,n)}catch(e){}}
+  if(x)setTimeout(()=>x.scrollIntoView({block:'center',behavior:'smooth'}),60)}
+function closeKp(){const o=st.focus;st.focus=null;if(o){const x=rowEl(o);if(x&&document.activeElement===x)x.blur();showRow(o)}const k=$('kp');if(k)k.style.display='none';document.body.classList.remove('kp')}
+function kpKey(k){const id=st.focus;if(!id)return;const x=rowEl(id);let e=st.ex[id]||'',rs=e.length,re=e.length;
+  if(x&&document.activeElement===x&&x.selectionStart!=null){rs=rawIdx(x.value,x.selectionStart);re=rawIdx(x.value,x.selectionEnd)}
+  else if(st.car[id]!==undefined)rs=re=Math.min(st.car[id],e.length);
+  const wasAuto=st.auto===id;st.auto=null;if(wasAuto&&/^\d$/.test(k)){e='';rs=re=0}
+  let before=e.slice(0,rs),after=e.slice(re),ins='';const lb=before.slice(-1),la=after[0]||'',dg=ch=>/\d/.test(ch||''),isOp=ch=>!!ch&&'+-*/'.includes(ch);
+  const open=(before.match(/\(/g)||[]).length-(before.match(/\)/g)||[]).length;
+  if(/^\d$/.test(k)){const lr=(before.match(/\d+$/)||[''])[0],rr=(after.match(/^\d+/)||[''])[0];if(lr.length+rr.length>=12)return;
+    if(lr==='0'&&!rr)before=before.slice(0,-1);
+    ins=((lb===')'||lb==='%')&&lr!=='0'?'*':'')+k+(la==='('?'*':'')}
+  else if(k==='b'){if(rs===re){if(!rs)return;before=before.slice(0,-1)}}
+  else if(k==='c'){before='';after=''}
+  else if(k==='('){ins=(dg(lb)||lb===')'||lb==='%'?'*':'')+'('}
+  else if(k===')'){if(open>0&&(dg(lb)||lb===')'||lb==='%'))ins=')';else return}
+  else if(k==='%'){if(dg(lb)||lb===')')ins='%';else return}
+  else{if(!before||lb==='(')return;if(isOp(lb))before=before.slice(0,-1);if(isOp(la))after=after.slice(1);ins=k}
+  e=before+ins+after;const cp=before.length+ins.length;st.ex[id]=e;st.car[id]=cp;st.cust[id]=rowVal(id);showRow(id);fill();
+  const nx=rowEl(id);if(nx){const cur=st.ex[id]||'',pos=disp(cur).m[Math.min(cp,cur.length)];if(document.activeElement!==nx)nx.focus({preventScroll:true});try{nx.setSelectionRange(pos,pos)}catch(er){}}}
+const FAB='<button id="fab" aria-label="ثبت هزینه"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>';
+const KP=`<div id="kp" style="display:none"><div class="kh"><span id="kpn" class="s"></span></div><div class="kg">
+<button class="cc" data-k="c">C</button><button data-k="(">(</button><button data-k=")">)</button><button data-k="b">⌫</button>
+<button data-k="7">۷</button><button data-k="8">۸</button><button data-k="9">۹</button><button class="o" data-k="/">÷</button>
+<button data-k="4">۴</button><button data-k="5">۵</button><button data-k="6">۶</button><button class="o" data-k="*">×</button>
+<button data-k="1">۱</button><button data-k="2">۲</button><button data-k="3">۳</button><button class="o" data-k="-">−</button>
+<button class="o" data-k="ok">✓</button><button data-k="0">۰</button><button data-k="%">%</button><button class="o" data-k="+">＋</button></div></div>`;
+async function addExp(){if(st.busy)return;const m=model(),er=$('err');er.textContent='';
+  const title=$('tt').value.trim(),amount=toNum($('am').value),date=normDate($('dt').value),parts=sel(m);
+  if(!title)return er.textContent='عنوان را وارد کنید.';if(!amount)return er.textContent='مبلغ را وارد کنید.';
+  if(!date)return er.textContent='تاریخ را مثل ۱۴۰۵/۰۸/۱۸ بنویسید.';
+  if(!st.payer)return er.textContent='پرداخت‌کننده را انتخاب کنید.';if(!parts.length)return er.textContent='حداقل یک سهیم انتخاب کنید.';
+  const shares={};
+  if(st.mode==='equal'){const b=Math.floor(amount/parts.length);parts.forEach(i=>shares[i]=b);shares[parts[0]]+=amount-b*parts.length}
+  else{let t=0;parts.forEach(i=>{shares[i]=st.cust[i]||0;t+=shares[i]});if(t!==amount)return er.textContent='مجموع سهم‌ها با مبلغ برابر نیست.'}
+  const o={t:'exp',id:st.edit?st.edit.id:rid(),title,amount,payer:st.payer,shares,date,custom:st.mode==='custom'};
+  st.busy=1;setBtn('addE',true);try{if(st.edit){o.at=st.edit.at;await db.doc('gx_'+cur.gid+'/'+st.edit._d).set(o)}else await put(o);resetForm();closeForm()}
+  catch(e){er.textContent='ثبت ممکن نشد (دسترسی ویرایش لازم است).'}st.busy=0;setBtn('addE',false)}
+function closeForm(){const sf=$('sf');if(!sf)return;sf.querySelector('.ab').style.display='none';sf.querySelector('.ah').classList.remove('open')}
+function resetForm(){closeKp();st.edit=null;st.cust={};st.ex={};st.car={};st.auto=null;$('tt').value='';$('am').value='';$('addE').textContent='ثبت هزینه';$('editb').style.display='none';renderShares()}
+function startEdit(e){const m=model();st.edit={id:e.id,_d:e._d,at:e.at};
+  $('tt').value=e.title;$('am').value=unit(e.amount);$('dt').value=fd(e.date||'');st.payer=e.payer;
+  st.sel={};m.people.forEach(p=>st.sel[p.id]=p.id in (e.shares||{}));
+  st.mode=e.custom?'custom':'equal';st.cust={};st.ex={};st.car={};st.auto=null;
+  if(e.custom)Object.entries(e.shares||{}).forEach(([i,v])=>{st.cust[i]=v;st.ex[i]=String(v)});
+  document.querySelectorAll('#mseg div').forEach(x=>x.classList.toggle('on',x.dataset.m===st.mode));
+  $('addE').textContent='ذخیره تغییرات';$('editb').style.display='';
+  $('sf').querySelector('.ab').style.display='';$('sf').querySelector('.ah').classList.add('open');
+  renderParts();$('sf').scrollIntoView({behavior:'smooth'})}
+
+function renderParts(){if(!$('plist'))return;banner();const m=model(),A=adm(),J=P.find(x=>x._d===cur.pid)||{};$('gt').textContent=m.name;
+  if(J.me&&!m.claims[J.me]&&!st.cl){st.cl=1;db.doc('gx_'+cur.gid+'/claim_'+J.me).set({t:'claim',pid:J.me,by:myId,at:Date.now()}).catch(()=>{})}
+  $('rl').textContent=A?'👑 شما ادمین هستید':'';
+  
+  $('addp').style.display=A&&!m.locked?'':'none';$('lockb').style.display=A&&!m.locked&&m.people.length?'':'none';$('unlk').style.display=A&&m.locked?'':'none';
+  if(m.vc)$('cv').value=m.vc;
+  $('plist').innerHTML=m.people.length?m.people.map(p=>`<span class="chip">${esc(p.name)}</span>`).join(''):'<span class="s">هنوز عضوی اضافه نشده.</span>';
+  $('me').innerHTML='<option value="">انتخاب کنید…</option>'+m.people.filter(p=>!m.claims[p.id]||m.claims[p.id]===myId||p.id===J.me).map(p=>`<option value="${esc(p.id)}"${p.id===J.me?' selected':''}>${esc(p.name)}</option>`).join('');
+  if(!st.payer||!m.people.some(p=>p.id===st.payer))st.payer=(m.people.find(p=>p.id===J.me)||m.people[0]||{}).id||'';
+  $('py').innerHTML=m.people.map(p=>`<option value="${esc(p.id)}"${p.id===st.payer?' selected':''}>${esc(p.name)}</option>`).join('');
+  $('pp').innerHTML=m.people.map(p=>`<span class="chip ${st.sel[p.id]!==false?'on':''}" data-id="${esc(p.id)}">${esc(p.name)}</span>`).join('');
+  $('pp').querySelectorAll('.chip').forEach(c=>c.onclick=()=>{st.sel[c.dataset.id]=st.sel[c.dataset.id]===false;c.classList.toggle('on',st.sel[c.dataset.id]!==false);st.auto=null;renderShares()});
+  if(!document.activeElement||!document.activeElement.closest('#shr'))renderShares();
+  const bal=balances(m),nm=id=>(m.people.find(p=>p.id===id)||{name:'؟'}).name;
+  {const o=m.people.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join(''),f=$('pf'),t=$('pt'),a=f.value,b=t.value;f.innerHTML=o;t.innerHTML=o;if(a)f.value=a;if(b)t.value=b;else if(t.options.length>1)t.selectedIndex=1}
+  $('mine').innerHTML=J.me&&J.me in bal?'وضع شما: '+balTxt(bal[J.me]):'';
+  $('bal').innerHTML=m.people.length?m.people.map(p=>`<div class="row"><span>${esc(p.name)}</span>${balTxt(bal[p.id])}</div>`).join(''):'<div class="s">هنوز عضوی نیست.</div>';
+  const cr=[],de=[];m.people.forEach(p=>{const v=Math.round(bal[p.id]);if(v>0)cr.push({id:p.id,v});else if(v<0)de.push({id:p.id,v:-v})});
+  cr.sort((a,b)=>b.v-a.v);de.sort((a,b)=>b.v-a.v);const tx=[];let i=0,j=0;
+  while(i<de.length&&j<cr.length){const x=Math.min(de[i].v,cr[j].v);if(x>0)tx.push({f:de[i].id,t:cr[j].id,a:x});de[i].v-=x;cr[j].v-=x;if(!de[i].v)i++;if(!cr[j].v)j++}
+  $('set').innerHTML=tx.length?'<div class="lab" style="margin-top:12px">پیشنهاد پرداخت:</div>'+tx.map((t,k)=>`<div class="row"><span>${esc(nm(t.f))} ← ${tm(t.a)} ← ${esc(nm(t.t))}</span><button class="g" data-pay="${k}">ثبت پرداخت</button></div>`).join(''):'';
+  $('set').querySelectorAll('button[data-pay]').forEach(b=>armed(b,async()=>{const t=tx[b.dataset.pay];try{await put({t:'pay',id:rid(),from:t.f,to:t.t,amount:t.a,date:today()})}catch(e){}}));
+  const all=[...m.exps,...m.pays].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.at-a.at),rw=(k,v)=>`<div class="row"><span>${k}</span><span>${v}</span></div>`;
+  $('list').innerHTML=all.length?all.map(e=>{const o=st.open===e.id,pay=e.t==='pay';
+    const head=pay?`<div><b>💸 پرداخت</b><div class="s">${fd(e.date||'')} · ${esc(nm(e.from))} به ${esc(nm(e.to))}</div></div>`:`<div><b>${esc(e.title)}</b>${e.custom?'<span class="b pr">نامساوی</span>':''}<div class="s">${fd(e.date||'')} · ${esc(nm(e.payer))} پرداخت کرد</div></div>`;
+    let det='';
+    if(o)det='<div class="det">'+(pay?rw('تاریخ',fd(e.date||''))+rw('پرداخت‌کننده',esc(nm(e.from)))+rw('گیرنده',esc(nm(e.to)))+rw('مبلغ',tm(e.amount)):rw('تاریخ',fd(e.date||''))+rw('مبلغ کل',tm(e.amount))+rw('پرداخت‌کننده',esc(nm(e.payer)))+rw('نوع تقسیم',e.custom?'دلخواه':'مساوی')+'<div class="lab">سهم هر نفر:</div>'+Object.entries(e.shares||{}).map(([i,v])=>rw(esc(nm(i)),tm(v))).join(''))+(A&&!e._pending?`<div style="margin-top:6px">${pay?'':`<button class="g" data-edit="${esc(e.id)}">✏️ ویرایش</button>`}<button class="g" data-del="${esc(e.id)}">${pay?'حذف این پرداخت':'حذف این هزینه'}</button></div>`:'')+'</div>';
+    return `<div class="row" style="cursor:pointer" data-id="${esc(e.id)}">${head}<div style="white-space:nowrap">${e._pending?'<span class="b pr">⏳</span>':''}${tm(e.amount)} <span class="ar2${o?' open':''}">${CH}</span></div></div>`+det}).join(''):'<div class="s">هنوز هزینه‌ای ثبت نشده.</div>';
+  $('list').querySelectorAll('.row[data-id]').forEach(r=>r.onclick=()=>{st.open=st.open===r.dataset.id?null:r.dataset.id;renderParts()});
+  $('list').querySelectorAll('button[data-del]').forEach(b=>armed(b,async()=>{const e=all.find(x=>x.id===b.dataset.del);if(!e)return;try{if(e._d)await db.doc('gx_'+cur.gid+'/'+e._d).delete();st.open=null}catch(x){}}));$('list').querySelectorAll('button[data-edit]').forEach(b=>b.onclick=()=>{const e=m.exps.find(x=>x.id===b.dataset.edit);if(e)startEdit(e)})}
+</script>
+</body>
+</html>
