@@ -53,6 +53,7 @@ button.g{background:transparent;color:var(--mut);padding:4px 8px;font-weight:400
 @media (prefers-reduced-motion:reduce){#sf .ah:not(.open){animation:none}}
 :root{--ac3:#7c3aed}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ac3:#a78bfa}}
 body.nw #fab{display:none!important}
+.mb.hint{animation:pg 2.2s ease-in-out infinite}@media (prefers-reduced-motion:reduce){.mb.hint{animation:none}}
 </style>
 </head>
 <body>
@@ -346,7 +347,11 @@ function renderParts(){if(!$('plist'))return;banner();const m=model(),A=adm(),J=
   const canW=canWrite();document.body.classList.toggle('nw',!canW);
   $('sf').style.display=(canW||st.edit)?'':'none';
   {const px=$('payx');if(px)px.parentNode.style.display=canW?'':'none';if(!canW)$('payf').style.display='none'}
-  {const vn=$('vn'),show=!canW&&m.people.length>0;vn.style.display=show?'':'none';vn.textContent=show?'👀 فعلاً فقط تماشاگر هستید و نمی‌توانید چیزی را در گروه تغییر دهید. برای ثبت هزینه یا پرداخت، نام خودتان را در «شما کدام عضو هستید؟» انتخاب کنید.':''}
+  {const vn=$('vn');let t='';
+    if(!canW){
+      if(!m.people.length)t=A?'👋 گروه ساخته شد! برای شروع، از دکمه‌ی «👥 اعضا» بالای صفحه، اعضای گروه را اضافه کنید. بعد از آن نام خودتان را انتخاب کنید تا ثبت هزینه برایتان باز شود.':'هنوز عضوی در گروه نیست. ادمین باید اول اعضا را اضافه کند.';
+      else t=A?'👤 نام خودتان را در «شما کدام عضو هستید؟» انتخاب کنید تا ثبت هزینه و پرداخت برایتان باز شود.':'👀 فعلاً فقط تماشاگر هستید و نمی‌توانید چیزی را در گروه تغییر دهید. برای ثبت هزینه یا پرداخت، نام خودتان را در «شما کدام عضو هستید؟» انتخاب کنید.'}
+    vn.style.display=t?'':'none';vn.textContent=t;$('mb').classList.toggle('hint',A&&!m.people.length)}
   
   $('addp').style.display=A&&!m.locked?'':'none';$('lockb').style.display=A&&!m.locked&&m.people.length?'':'none';$('unlk').style.display=A&&m.locked?'':'none';
   if(m.vc){$('gid').dataset.c=m.vc;if(!$('gid').dataset.s){$('gid').innerHTML='شناسه گروه: <bdi dir="ltr">'+esc(m.vc)+'</bdi>'}}
