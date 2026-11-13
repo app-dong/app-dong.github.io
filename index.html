@@ -33,6 +33,12 @@ button.g{background:transparent;color:var(--mut);padding:4px 8px;font-weight:400
 .seg div{flex:1;text-align:center;padding:8px;cursor:pointer;font-size:14px}
 .seg .on{background:var(--ac);color:var(--acx);font-weight:600}
 .lab{font-size:13px;color:var(--mut);margin:4px 0}
+#gl .row{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#shb{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:60;display:flex;align-items:flex-end;justify-content:center}
+#shs{width:100%;max-width:640px;background:var(--card);border-radius:18px 18px 0 0;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));box-shadow:0 -4px 20px rgba(0,0,0,.2)}
+#shs .shn{font-weight:800;font-size:17px;text-align:center;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#shs .sb{display:block;width:100%;text-align:center;background:var(--bg);color:var(--tx);border:1px solid var(--bd);margin-top:8px}
+#shs .sb.dn{color:var(--no)}
 .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--bd);gap:8px}
 .row:first-of-type{border-top:0}
 .b{font-size:11px;border-radius:8px;padding:1px 8px;margin-inline-start:6px}
@@ -161,7 +167,27 @@ function renderHome(){const L=$('gl');if(!L)return;const gs=joinedList();
   L.innerHTML=gs.length?gs.map(g=>{const h=HS[g.gid];let sm='…';
     if(h&&h.es){const m=build(h.es);sm=g.me&&m.people.some(p=>p.id===g.me)?balTxt(balances(m)[g.me]):'<span>برای دیدن بدهی/طلب، نام خود را در گروه انتخاب کنید</span>'}
     return `<div class="row" style="cursor:pointer" data-id="${esc(g._d)}"><div><b>${esc(g.name)}</b>${g.role==='admin'?'<span class="b pu">👑 ادمین</span>':''}<div class="s">${sm}</div></div><span class="s">باز کردن ←</span></div>`}).join(''):'<div class="s">هنوز عضو گروهی نیستید.</div>';
-  L.querySelectorAll('.row').forEach(r=>r.onclick=()=>openGroup(gs.find(x=>x._d===r.dataset.id)))}
+  L.querySelectorAll('.row').forEach(r=>{const g=gs.find(x=>x._d===r.dataset.id);let t=null,x0=0,y0=0;
+    const cl=()=>{clearTimeout(t);t=null};
+    r.onclick=()=>{if(lpDone){lpDone=false;return}openGroup(g)};
+    r.oncontextmenu=e=>e.preventDefault();
+    r.onpointerdown=e=>{lpDone=false;x0=e.clientX;y0=e.clientY;cl();t=setTimeout(()=>{t=null;lpDone=true;try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}openSheet(g)},500)};
+    r.onpointermove=e=>{if(t&&(Math.abs(e.clientX-x0)>10||Math.abs(e.clientY-y0)>10))cl()};
+    r.onpointerup=r.onpointercancel=r.onpointerleave=cl});
+  if(gs.length)L.insertAdjacentHTML('beforeend','<div class="s" style="text-align:center;margin-top:8px">برای گزینه‌های بیشتر (حذف و…)، روی گروه نگه دارید</div>')}
+let lpDone=false,shPush=false;
+function closeSheet(pop){const b=$('shb');if(b)b.remove();if(shPush){shPush=false;if(!pop){skipN++;try{history.back()}catch(e){skipN--}}}}
+function openSheet(g){closeSheet();const A=g.role==='admin',h=HS[g.gid],m=h&&h.es?build(h.es):null,vc=m&&m.vc;
+  const d=document.createElement('div');d.id='shb';
+  d.innerHTML=`<div id="shs"><div class="shn">${esc(g.name)}</div><button class="sb" id="so">باز کردن گروه</button>${vc?`<button class="sb" id="sc">کپی شناسه گروه (<bdi dir="ltr">${esc(vc)}</bdi>)</button>`:''}<button class="sb dn" id="sd">${A?'حذف گروه':'ترک گروه'}</button><div class="s" style="text-align:center;margin-top:6px">${A?'با حذف گروه، اطلاعات آن برای همه‌ی اعضا پاک می‌شود.':'فقط از لیست گروه‌های شما حذف می‌شود.'}</div><button class="sb" id="sx">انصراف</button></div>`;
+  document.body.appendChild(d);
+  try{history.pushState({sh:1},'');shPush=true}catch(e){}
+  d.onclick=e=>{if(e.target===d)closeSheet()};
+  $('sx').onclick=()=>closeSheet();
+  $('so').onclick=()=>{const had=shPush;shPush=false;d.remove();if(had)gPush=true;openGroup(g)};
+  const sc=$('sc');if(sc)sc.onclick=async()=>{let ok=false;try{await navigator.clipboard.writeText(vc);ok=true}catch(e){try{const ta=document.createElement('textarea');ta.value=vc;document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');ta.remove()}catch(_){}}
+    sc.textContent=ok?'کپی شد ✓':'کپی ممکن نشد';setTimeout(()=>closeSheet(),700)};
+  armed($('sd'),()=>{closeSheet();A?removeGroup(g):leaveGroup(g)})}
 let busy=false;
 const setBtn=(id,on,t)=>{const b=$(id);if(b){b.disabled=on;if(t)b.textContent=t}};
 async function mkGroup(){if(busy)return;const n=$('gn').value.trim(),e=$('e1');e.style.color='';e.textContent='';if(!n)return e.textContent='نام گروه را بنویسید.';
@@ -196,8 +222,9 @@ async function wipe(gid){const s=await db.collection('gx_'+gid).get(),cd=[];
   s.docs.forEach(d=>{const x=d.data();if(x.t==='meta')cd.push(x.vc,x.ac)});
   await Promise.all([...s.docs.map(d=>db.doc('gx_'+gid+'/'+d.id).delete()),...cd.filter(Boolean).map(c=>db.doc('codes/'+c).delete())]);
   const g=await db.collection('gm_'+gid).get();await Promise.all(g.docs.map(d=>db.doc('gm_'+gid+'/'+d.id).delete()))}
-async function leaveGroup(){try{const J=P.find(x=>x._d===cur.pid)||{};if(J.me)await db.doc('gx_'+cur.gid+'/claim_'+J.me).delete().catch(()=>{});await db.doc(pcol()+'/'+cur.pid).delete()}catch(e){}homeShell()}
-async function removeGroup(){try{const gid=cur.gid,pid=cur.pid;await wipe(gid);await db.doc(pcol()+'/'+pid).delete()}catch(e){}homeShell()}
+async function leaveGroup(g){g=g||cur;const pid=g.pid||g._d;try{const J=P.find(x=>x._d===pid)||{};if(J.me)await db.doc('gx_'+g.gid+'/claim_'+J.me).delete().catch(()=>{});await db.doc(pcol()+'/'+pid).delete()}catch(e){}afterGone()}
+async function removeGroup(g){g=g||cur;try{await wipe(g.gid);await db.doc(pcol()+'/'+(g.pid||g._d)).delete()}catch(e){}afterGone()}
+function afterGone(){if(view==='group')homeShell();else if(view==='home'){syncSubs();renderHome()}}
 
 function groupShell(){view='group';
   $('app').innerHTML=`<div class="sh"><button class="g" id="bk">→ بازگشت</button><span class="gid" id="gid"></span><button class="g" id="dg">حذف گروه</button></div>
@@ -285,6 +312,7 @@ function showRow(id){const x=rowEl(id);if(!x)return;const e=st.ex[id]||'',foc=st
   const p=document.querySelector('#shr [data-pv="'+id+'"]');
   if(p){if(rv>0){p.dir='ltr';p.style.textAlign='right';p.textContent=disp(e).t}else{p.dir='rtl';p.style.textAlign='';p.textContent=e?'= '+tm(rowVal(id)):''}}}
 window.addEventListener('popstate',()=>{if(skipN>0){skipN--;return}
+  if(shPush){closeSheet(true);return}
   if(kpPush){kpPush=false;closeKp(true);return}
   if(gPush&&view==='group'){gPush=false;homeShell()}});
 function kpUnpush(){if(kpPush){kpPush=false;skipN++;try{history.back()}catch(e){skipN--}}}
