@@ -189,6 +189,7 @@ function groupShell(){view='group';
   sec('s','ss','تسویه حساب',`<div id="bal"></div><div id="set"></div><div style="text-align:center;margin-top:6px"><button class="g" id="payx">+ ثبت پرداخت دلخواه</button></div>
   <div id="payf" style="display:none"><div class="lab">چه کسی پرداخت کرد</div><select id="pf"></select><div class="lab">به چه کسی</div><select id="pt"></select><input type="text" id="pa" inputmode="numeric" placeholder="مبلغ (تومان)"><button id="pgo" style="width:100%">ثبت پرداخت</button><div class="s err" id="perr"></div></div>`,true)+
   sec('l','sl','هزینه‌ها','<div id="list"></div>')+
+  sec('mm','smm','هزینه‌های من','<div id="mlist"></div>')+
   sec('f','sf','ثبت هزینه',`<div id="editb" class="s" style="display:none;color:var(--pv);margin-bottom:8px">✏️ در حال ویرایش هزینه — <button class="g" id="cancelE">انصراف</button></div><input type="text" id="tt" placeholder="بابت (مثلاً شام)">
   <div class="r"><input type="text" id="am" inputmode="numeric" placeholder="مبلغ (تومان)"><input type="text" id="dt" dir="ltr" value="${fd(today())}"></div>
   <div class="lab">پرداخت‌کننده</div><select id="py"></select>
@@ -268,8 +269,10 @@ function openKp(id){const old=st.focus;st.focus=id;if(!kpPush){try{history.pushS
   const x=rowEl(id),before=x?x.value:'';showRow(id);const m=model(),p=m.people.find(q=>q.id===id);
   $('kpn').textContent='سهم '+(p?p.name:'');$('kp').style.display='';document.body.classList.add('kp');
   if(x&&x.value!==before){const n=x.value.length;try{x.setSelectionRange(n,n)}catch(e){}}
-  if(x)setTimeout(()=>x.scrollIntoView({block:'center',behavior:'smooth'}),60)}
-function closeKp(fromPop){if(!fromPop)kpUnpush();const o=st.focus;st.focus=null;if(o){const x=rowEl(o);if(x&&document.activeElement===x)x.blur();showRow(o)}const k=$('kp');if(k)k.style.display='none';document.body.classList.remove('kp')}
+  if(x){document.body.style.paddingBottom=($('kp').offsetHeight+30)+'px';setTimeout(()=>kpReveal(x),90);setTimeout(()=>kpReveal(x),420)}}
+function kpReveal(x){if(!x.isConnected||st.focus!==x.dataset.id)return;const kh=$('kp').offsetHeight,vis=window.innerHeight-kh;if(vis<140)return;
+  const r=x.getBoundingClientRect(),want=Math.max(70,(vis-r.height)/2-14),d=r.top-want;if(Math.abs(d)>6)window.scrollBy({top:d,behavior:'smooth'})}
+function closeKp(fromPop){if(!fromPop)kpUnpush();const o=st.focus;st.focus=null;if(o){const x=rowEl(o);if(x&&document.activeElement===x)x.blur();showRow(o)}const k=$('kp');if(k)k.style.display='none';document.body.classList.remove('kp');document.body.style.paddingBottom=''}
 function kpKey(k){const id=st.focus;if(!id)return;const x=rowEl(id);let e=st.ex[id]||'',rs=e.length,re=e.length;
   if(x&&document.activeElement===x&&x.selectionStart!=null){rs=rawIdx(x.value,x.selectionStart);re=rawIdx(x.value,x.selectionEnd)}
   else if(st.car[id]!==undefined)rs=re=Math.min(st.car[id],e.length);
@@ -350,7 +353,26 @@ function renderParts(){if(!$('plist'))return;banner();const m=model(),A=adm(),J=
     if(o)det='<div class="det">'+(pay?rw('تاریخ',fd(e.date||''))+rw('پرداخت‌کننده',esc(nm(e.from)))+rw('گیرنده',esc(nm(e.to)))+rw('مبلغ',tm(e.amount)):rw('تاریخ',fd(e.date||''))+rw('مبلغ کل',tm(e.amount))+rw('پرداخت‌کننده',esc(nm(e.payer)))+(e.by?rw('ثبت‌کننده',esc(nm(e.by))):'')+rw('نوع تقسیم',e.custom?'دلخواه':'مساوی')+'<div class="lab">سهم هر نفر:</div>'+Object.entries(e.shares||{}).map(([i,v])=>rw(esc(nm(i)),tm(v))).join(''))+(A&&!e._pending?`<div style="margin-top:6px">${pay?'':`<button class="g" data-edit="${esc(e.id)}">✏️ ویرایش</button>`}<button class="g" data-del="${esc(e.id)}">${pay?'حذف این پرداخت':'حذف این هزینه'}</button></div>`:'')+'</div>';
     return `<div class="row" style="cursor:pointer" data-id="${esc(e.id)}">${head}<div style="white-space:nowrap">${e._pending?'<span class="b pr">⏳</span>':''}${tm(e.amount)} <span class="ar2${o?' open':''}">${CH}</span></div></div>`+det}).join(''):'<div class="s">هنوز هزینه‌ای ثبت نشده.</div>';
   $('list').querySelectorAll('.row[data-id]').forEach(r=>r.onclick=()=>{st.open=st.open===r.dataset.id?null:r.dataset.id;renderParts()});
-  $('list').querySelectorAll('button[data-del]').forEach(b=>armed(b,async()=>{const e=all.find(x=>x.id===b.dataset.del);if(!e)return;try{if(e._d)await db.doc('gx_'+cur.gid+'/'+e._d).delete();st.open=null}catch(x){}}));$('list').querySelectorAll('button[data-edit]').forEach(b=>b.onclick=()=>{const e=m.exps.find(x=>x.id===b.dataset.edit);if(e)startEdit(e)})}
+  $('list').querySelectorAll('button[data-del]').forEach(b=>armed(b,async()=>{const e=all.find(x=>x.id===b.dataset.del);if(!e)return;try{if(e._d)await db.doc('gx_'+cur.gid+'/'+e._d).delete();st.open=null}catch(x){}}));$('list').querySelectorAll('button[data-edit]').forEach(b=>b.onclick=()=>{const e=m.exps.find(x=>x.id===b.dataset.edit);if(e)startEdit(e)});
+  renderMine(m,J,bal,nm,all,rw)}
+function renderMine(m,J,bal,nm,all,rw){const L=$('mlist');if(!L)return;
+  const me=J.me&&m.people.some(p=>p.id===J.me)?J.me:null;
+  if(!me){L.innerHTML='<div class="s">برای دیدن هزینه‌های خودتان، اول نام خودتان را از بخش «اعضا» انتخاب کنید.</div>';return}
+  const my=all.filter(e=>e.t==='pay'?(e.from===me||e.to===me):(e.payer===me||me in (e.shares||{}))),xs=my.filter(e=>e.t!=='pay'),
+    paid=xs.reduce((a,e)=>a+(e.payer===me?e.amount:0),0),sh=xs.reduce((a,e)=>a+((e.shares||{})[me]||0),0);
+  let h='<div class="det">'+rw('جمع پرداختی شما برای هزینه‌ها',tm(paid))+rw('جمع سهم شما از هزینه‌ها',tm(sh))+rw('وضع شما',balTxt(bal[me]))+'</div>';
+  h+=my.length?my.map(e=>{const o=st.openM===e.id,pay=e.t==='pay',ch=`<span class="ar2${o?' open':''}">${CH}</span>`;let head,right,det='';
+    if(pay){const out=e.from===me;
+      head=`<div><b>💸 پرداخت</b><div class="s">${fd(e.date||'')} · ${esc(nm(e.from))} به ${esc(nm(e.to))}</div></div>`;
+      right=`<div class="${out?'pos':'neg'}" style="white-space:nowrap">${out?'+':'−'} ${tm(e.amount)}</div>`;
+      if(o)det='<div class="det">'+rw('تاریخ',fd(e.date||''))+rw('پرداخت‌کننده',esc(nm(e.from)))+rw('گیرنده',esc(nm(e.to)))+rw('مبلغ',tm(e.amount))+'</div>'}
+    else{const my1=(e.shares||{})[me]||0,net=(e.payer===me?e.amount:0)-my1;
+      head=`<div><b>${esc(e.title)}</b>${e.custom?'<span class="b pr">نامساوی</span>':''}<div class="s">${fd(e.date||'')} · ${e.payer===me?'شما پرداخت کردید':esc(nm(e.payer))+' پرداخت کرد'}</div></div>`;
+      right=`<div style="text-align:left;white-space:nowrap"><div>سهم شما: ${tm(my1)}</div><div class="s">از ${tm(e.amount)}</div></div>`;
+      if(o)det='<div class="det">'+rw('تاریخ',fd(e.date||''))+rw('مبلغ کل',tm(e.amount))+rw('پرداخت‌کننده',esc(nm(e.payer)))+(e.by?rw('ثبت‌کننده',esc(nm(e.by))):'')+rw('نوع تقسیم',e.custom?'دلخواه':'مساوی')+rw('سهم شما',tm(my1))+rw('تأثیر روی وضع شما',balTxt(net))+'<div class="lab">سهم هر نفر:</div>'+Object.entries(e.shares||{}).map(([i,v])=>rw(esc(nm(i)),tm(v))).join('')+'</div>'}
+    return `<div class="row" style="cursor:pointer" data-mid="${esc(e.id)}">${head}<div style="display:flex;align-items:center;gap:6px">${right}${ch}</div></div>`+det}).join(''):'<div class="s">هنوز هزینه‌ای برای شما ثبت نشده.</div>';
+  L.innerHTML=h;
+  L.querySelectorAll('.row[data-mid]').forEach(r=>r.onclick=()=>{st.openM=st.openM===r.dataset.mid?null:r.dataset.mid;renderParts()})}
 </script>
 </body>
 </html>
