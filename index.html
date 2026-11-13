@@ -33,6 +33,7 @@ button.g{background:transparent;color:var(--mut);padding:4px 8px;font-weight:400
 .seg div{flex:1;text-align:center;padding:8px;cursor:pointer;font-size:14px}
 .seg .on{background:var(--ac);color:var(--acx);font-weight:600}
 .lab{font-size:13px;color:var(--mut);margin:4px 0}
+#gl .dt{background:transparent;color:var(--mut);padding:8px 6px;font-weight:400;line-height:0;border-radius:50%;flex:0 0 auto}
 #gl .row{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 #shb{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:60;display:flex;align-items:flex-end;justify-content:center}
 #shs{width:100%;max-width:640px;background:var(--card);border-radius:18px 18px 0 0;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));box-shadow:0 -4px 20px rgba(0,0,0,.2)}
@@ -166,11 +167,12 @@ function homeShell(){kpUnpush();gUnpush();document.body.classList.remove('nw');d
 function renderHome(){const L=$('gl');if(!L)return;const gs=joinedList();
   L.innerHTML=gs.length?gs.map(g=>{const h=HS[g.gid];let sm='…';
     if(h&&h.es){const m=build(h.es);sm=g.me&&m.people.some(p=>p.id===g.me)?balTxt(balances(m)[g.me]):'<span>برای دیدن بدهی/طلب، نام خود را در گروه انتخاب کنید</span>'}
-    return `<div class="row" style="cursor:pointer" data-id="${esc(g._d)}"><div><b>${esc(g.name)}</b>${g.role==='admin'?'<span class="b pu">👑 ادمین</span>':''}<div class="s">${sm}</div></div><span class="s">باز کردن ←</span></div>`}).join(''):'<div class="s">هنوز عضو گروهی نیستید.</div>';
+    return `<div class="row" style="cursor:pointer" data-id="${esc(g._d)}"><div><b>${esc(g.name)}</b>${g.role==='admin'?'<span class="b pu">👑 ادمین</span>':''}<div class="s">${sm}</div></div><button class="dt" aria-label="گزینه‌ها"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>`}).join(''):'<div class="s">هنوز عضو گروهی نیستید.</div>';
   L.querySelectorAll('.row').forEach(r=>{const g=gs.find(x=>x._d===r.dataset.id);let t=null,x0=0,y0=0;
     const cl=()=>{clearTimeout(t);t=null};
     r.onclick=()=>{if(lpDone){lpDone=false;return}openGroup(g)};
     r.oncontextmenu=e=>e.preventDefault();
+    const dt=r.querySelector('.dt');dt.onpointerdown=e=>e.stopPropagation();dt.onclick=e=>{e.stopPropagation();lpDone=false;openSheet(g)};
     r.onpointerdown=e=>{lpDone=false;x0=e.clientX;y0=e.clientY;cl();t=setTimeout(()=>{t=null;lpDone=true;try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}openSheet(g)},500)};
     r.onpointermove=e=>{if(t&&(Math.abs(e.clientX-x0)>10||Math.abs(e.clientY-y0)>10))cl()};
     r.onpointerup=r.onpointercancel=r.onpointerleave=cl});
