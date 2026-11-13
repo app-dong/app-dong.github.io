@@ -42,6 +42,16 @@ button.g{background:transparent;color:var(--mut);padding:4px 8px;font-weight:400
 .msg{text-align:center;color:var(--mut);padding:30px 10px}
 .sh{display:flex;align-items:center;gap:8px}.sh span{flex:1}.sh input{margin:0;flex:1;min-width:90px}.sh .plus{flex:0 0 auto;padding:6px 10px}.pv{margin:-2px 0 6px}input:focus,textarea:focus{outline:2px solid var(--ac)}#fab{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));inset-inline-end:18px;width:56px;height:56px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(0,0,0,.28);z-index:40}body.kp #fab{display:none!important}#kp{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);border-top:1px solid var(--bd);padding:4px 8px calc(8px + env(safe-area-inset-bottom,0px))}.kh{display:flex;justify-content:space-between;align-items:center;margin-bottom:0;line-height:1.4;max-width:520px;margin-inline:auto}.kg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;direction:ltr;max-width:520px;margin:0 auto}.kg button{height:66px;font-family:"Google Sans",Roboto,"Segoe UI",system-ui,sans-serif;font-size:26px;font-weight:400;padding:0;background:transparent;color:var(--tx);border:0;border-radius:12px;display:flex;align-items:center;justify-content:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.kg button:active{background:var(--bd)}.kg button.o{color:var(--ac);font-size:28px}.kg button.cc{color:var(--no);font-size:22px}.kg button.ok{background:var(--ac);color:var(--acx);border-radius:33px}.kg button.ok:active{background:var(--ac);opacity:.85}.xb{flex:1;width:100%;min-height:42px;padding:9px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;line-height:1.7;resize:none;overflow:hidden;margin:0}.cr{display:inline-block;width:2px;height:1.15em;background:var(--ac);vertical-align:text-bottom;margin:0 -1px;animation:bl 1s steps(1) infinite}@keyframes bl{50%{opacity:0}}.xb i{font-style:normal}body.kp{padding-bottom:420px}
 .th{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 6px}.mr{display:flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0}#meh select{margin:0;width:auto;max-width:150px;padding:7px 8px;font-size:13px;border-color:var(--ac2)}.th h1{margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis}.mb{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;font-size:14px;white-space:nowrap;background:var(--tint);color:var(--ac2);border:1px solid var(--bd)}.mb .ar2{color:inherit}.gid{font-size:10px;color:var(--mut);text-align:center;cursor:pointer;user-select:none;line-height:1.3}.gid bdi{letter-spacing:.5px}#mp{margin-top:4px}.ah{position:relative;display:flex;justify-content:center;align-items:center;cursor:pointer;font-weight:800;font-size:18px;background:var(--tint);color:var(--ac2);border-radius:10px;padding:10px 40px}.ar{position:absolute;inset-inline-end:12px;top:50%;margin-top:-8px;display:flex;opacity:.85;transition:transform .2s}.ah.open .ar{transform:rotate(180deg)}.ar2{display:inline-flex;vertical-align:middle;color:var(--mut);transition:transform .2s}.ar2.open{transform:rotate(180deg)}.ab{margin-top:12px}.acc{padding:12px 14px}.det{background:var(--bg);border-radius:10px;padding:10px 12px;margin:0 0 8px;font-size:14px}.det .row{padding:4px 0}
+#sf{border:2px solid var(--ac);background:linear-gradient(180deg,var(--tint),var(--card) 140px);box-shadow:0 0 0 3px rgba(91,140,255,.14),0 10px 28px rgba(91,140,255,.22);position:relative;overflow:hidden}
+#sf .ah{background:linear-gradient(135deg,var(--ac),var(--ac3));color:var(--acx);font-size:19px;font-weight:800;padding:15px 48px;border-radius:14px}
+#sf .ah:not(.open){animation:pg 2.6s ease-in-out infinite}
+#sf .ar{color:var(--acx);opacity:1}
+.plc{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--acx);color:var(--ac);vertical-align:middle;margin-inline-end:8px;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+#addE{background:linear-gradient(135deg,var(--ac),var(--ac3));color:var(--acx);font-size:16px;padding:13px 16px;box-shadow:0 6px 16px rgba(91,140,255,.35)}
+#fab{background:linear-gradient(135deg,var(--ac),var(--ac3))}
+@keyframes pg{0%,100%{box-shadow:0 0 0 0 rgba(124,92,255,0)}50%{box-shadow:0 0 0 7px rgba(124,92,255,.22)}}
+@media (prefers-reduced-motion:reduce){#sf .ah:not(.open){animation:none}}
+:root{--ac3:#7c3aed}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ac3:#a78bfa}}
 </style>
 </head>
 <body>
@@ -93,6 +103,7 @@ function calc(s){s=en(s).replace(/[٬,،\s]/g,'').replace(/×/g,'*').replace(/÷
   const add=()=>{let v=mul();while(s[i]==='+'||s[i]==='-'){const o=s[i++];let r=mul();if(pf)r=v*r;v=o==='+'?v+r:v-r;pf=false}return v};
   try{const v=add();return i===s.length&&isFinite(v)?Math.round(v):NaN}catch(e){return NaN}}
 let db,myId=null,P=[],cur=null,unsub=null,view='home',HS={};
+let kpPush=false,gPush=false,skipN=0;
 let st={payer:'',sel:{},mode:'equal',cust:{},ex:{},car:{},edit:null,cl:0,auto:null,open:null};
 const pcol=()=>'data/users/'+myId;
 const pc=()=>db.collection(pcol());
@@ -132,7 +143,7 @@ function syncSubs(){const gs=joinedList(),keep=new Set(gs.map(g=>g.gid));
     h.u=db.collection('gx_'+g.gid).onSnapshot(s=>{
       if(s.empty&&!s.metadata.fromCache){P.filter(x=>x.gid===g.gid).forEach(x=>db.doc(pcol()+'/'+x._d).delete().catch(()=>{}));return}
       h.es=s.docs.map(d=>d.data());if(view==='home')renderHome()},()=>{})})}
-function homeShell(){kpUnpush();document.body.classList.remove('kp');view='home';cur=null;if(unsub){unsub();unsub=null}
+function homeShell(){kpUnpush();gUnpush();document.body.classList.remove('kp');view='home';cur=null;if(unsub){unsub();unsub=null}
   $('app').innerHTML=`<h1>🧾 دونگ</h1>
   <div class="c"><h2>گروه‌های من</h2><div id="gl"></div></div>
   <div class="c"><h2>ساخت گروه جدید</h2><div class="r"><input type="text" id="gn" placeholder="نام گروه (مثلاً سفر شمال)"><button id="g1">ساخت</button></div><div class="s err" id="e1"></div></div>
@@ -163,7 +174,7 @@ async function joinGroup(){if(busy)return;const e=$('e2');e.style.color='';e.tex
   busy=false;setBtn('g3',false,'ورود')}
 
 // ----- group -----
-function openGroup(g){stopSubs();
+function openGroup(g){stopSubs();if(!gPush){try{history.pushState({g:1},'');gPush=true}catch(e){}}
   const tok={pid:g._d,name:g.name,gid:g.gid,role:g.role,entries:[]};
   cur=tok;st={payer:'',sel:{},mode:'equal',cust:{},ex:{},car:{},edit:null,cl:0,auto:null,open:null};groupShell();
   unsub=db.collection('gx_'+g.gid).onSnapshot(s=>{if(cur!==tok)return;tok.entries=s.docs.map(d=>({...d.data(),_d:d.id,_pending:d.pending?1:0}));renderParts()},()=>{})}
@@ -190,7 +201,7 @@ function groupShell(){view='group';
   <div id="payf" style="display:none"><div class="lab">چه کسی پرداخت کرد</div><select id="pf"></select><div class="lab">به چه کسی</div><select id="pt"></select><input type="text" id="pa" inputmode="numeric" placeholder="مبلغ (تومان)"><button id="pgo" style="width:100%">ثبت پرداخت</button><div class="s err" id="perr"></div></div>`,true)+
   sec('l','sl','کل هزینه‌ها','<div id="list"></div>')+
   sec('mm','smm','هزینه‌های من','<div id="mlist"></div>')+
-  sec('f','sf','ثبت هزینه جدید',`<div id="editb" class="s" style="display:none;color:var(--pv);margin-bottom:8px">✏️ در حال ویرایش هزینه — <button class="g" id="cancelE">انصراف</button></div><input type="text" id="tt" placeholder="بابت (مثلاً شام)">
+  sec('f','sf','<span class="plc">'+PL+'</span>ثبت هزینه جدید',`<div id="editb" class="s" style="display:none;color:var(--pv);margin-bottom:8px">✏️ در حال ویرایش هزینه — <button class="g" id="cancelE">انصراف</button></div><input type="text" id="tt" placeholder="بابت (مثلاً شام)">
   <div class="r"><input type="text" id="am" inputmode="numeric" placeholder="مبلغ (تومان)"><input type="text" id="dt" dir="ltr" value="${fd(today())}"></div>
   <div class="lab">پرداخت‌کننده</div><select id="py"></select>
   <div class="lab">سهیم‌ها</div><div class="chips" id="pp"></div>
@@ -262,9 +273,11 @@ function showRow(id){const x=rowEl(id);if(!x)return;const e=st.ex[id]||'',foc=st
   if(x.value!==v)x.value=v;fit(x);
   const p=document.querySelector('#shr [data-pv="'+id+'"]');
   if(p){if(rv>0){p.dir='ltr';p.style.textAlign='right';p.textContent=disp(e).t}else{p.dir='rtl';p.style.textAlign='';p.textContent=e?'= '+tm(rowVal(id)):''}}}
-let kpPush=false,kpSkip=false;
-window.addEventListener('popstate',()=>{if(kpSkip){kpSkip=false;return}if(kpPush){kpPush=false;closeKp(true)}});
-function kpUnpush(){if(kpPush){kpPush=false;kpSkip=true;try{history.back()}catch(e){kpSkip=false}}}
+window.addEventListener('popstate',()=>{if(skipN>0){skipN--;return}
+  if(kpPush){kpPush=false;closeKp(true);return}
+  if(gPush&&view==='group'){gPush=false;homeShell()}});
+function kpUnpush(){if(kpPush){kpPush=false;skipN++;try{history.back()}catch(e){skipN--}}}
+function gUnpush(){if(gPush){gPush=false;skipN++;try{history.back()}catch(e){skipN--}}}
 function openKp(id){const old=st.focus;st.focus=id;if(!kpPush){try{history.pushState({kp:1},'');kpPush=true}catch(e){}}if(old&&old!==id)showRow(old);
   const x=rowEl(id),before=x?x.value:'';showRow(id);const m=model(),p=m.people.find(q=>q.id===id);
   $('kpn').textContent='سهم '+(p?p.name:'');$('kp').style.display='';document.body.classList.add('kp');
@@ -290,6 +303,7 @@ function kpKey(k){const id=st.focus;if(!id)return;const x=rowEl(id);let e=st.ex[
   else{if(!before||lb==='(')return;if(isOp(lb))before=before.slice(0,-1);if(isOp(la))after=after.slice(1);ins=k}
   e=before+ins+after;const cp=before.length+ins.length;st.ex[id]=e;st.car[id]=cp;st.cust[id]=rowVal(id);showRow(id);fill();
   const nx=rowEl(id);if(nx){const cur=st.ex[id]||'',pos=disp(cur).m[Math.min(cp,cur.length)];if(document.activeElement!==nx)nx.focus({preventScroll:true});try{nx.setSelectionRange(pos,pos)}catch(er){}}}
+const PL='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
 const FAB='<button id="fab" aria-label="ثبت هزینه"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>';
 const KP=`<div id="kp" style="display:none"><div class="kh"><span id="kpn" class="s"></span></div><div class="kg">
 <button class="cc" data-k="c">C</button><button data-k="(">(</button><button data-k=")">)</button><button data-k="b" aria-label="delete"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="M13 9.5l5 5M18 9.5l-5 5"/></svg></button>
