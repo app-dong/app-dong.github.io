@@ -145,8 +145,8 @@ function armed(b,fn){let t;b.onclick=()=>{if(b.dataset.a){clearTimeout(t);fn();r
 const joinedList=()=>{const d=new Set(P.filter(e=>e.t==='del').map(e=>e.ref));return P.filter(e=>e.t==='joined'&&e.v===2&&!d.has(e.id)).sort((a,b)=>b.at-a.at)};
 const rc=()=>String(1000+Math.floor(Math.random()*9000));
 async function freeCode(){for(let k=0;k<40;k++){const c=rc();if(!(await db.doc('codes/'+c).get()).exists)return c}throw 0}
-function build(es){es=es.slice().sort((a,b)=>a.at-b.at);const d=new Set(es.filter(e=>e.t==='del').map(e=>e.ref)),meta=es.find(e=>e.t==='meta'),lk=es.filter(e=>e.t==='lock').pop(),cl={};es.filter(e=>e.t==='claim').forEach(c=>cl[c.pid]=c.by);
-  return {people:es.filter(e=>e.t==='person'&&!d.has(e.id)),exps:es.filter(e=>e.t==='exp'&&!d.has(e.id)),pays:es.filter(e=>e.t==='pay'&&!d.has(e.id)),name:meta&&meta.name,vc:meta&&meta.vc,ac:meta&&meta.ac,locked:!!(lk&&lk.v),claims:cl}}
+function build(es){es=es.slice().sort((a,b)=>a.at-b.at);const d=new Set(es.filter(e=>e.t==='del').map(e=>e.ref)),meta=es.find(e=>e.t==='meta'),lk=es.filter(e=>e.t==='lock').pop(),pv=es.filter(e=>e.t==='priv').pop(),cl={};es.filter(e=>e.t==='claim').forEach(c=>cl[c.pid]=c.by);
+  return {people:es.filter(e=>e.t==='person'&&!d.has(e.id)),exps:es.filter(e=>e.t==='exp'&&!d.has(e.id)),pays:es.filter(e=>e.t==='pay'&&!d.has(e.id)),name:meta&&meta.name,vc:meta&&meta.vc,ac:meta&&meta.ac,locked:!!(lk&&lk.v),priv:!!(pv&&pv.v),claims:cl}}
 function balances(m){const b={};m.people.forEach(p=>b[p.id]=0);m.exps.forEach(e=>{if(!(e.payer in b))return;b[e.payer]+=e.amount;Object.entries(e.shares||{}).forEach(([i,v])=>{if(i in b)b[i]-=v})});(m.pays||[]).forEach(p=>{if(p.from in b)b[p.from]+=p.amount;if(p.to in b)b[p.to]-=p.amount});return b}
 const balTxt=v=>Math.abs(v)<0.5?'<span>تسویه‌شده ✓</span>':v>0?`<span class="pos">بستانکار ${tm(v)}</span>`:`<span class="neg">بدهکار ${tm(-v)}</span>`;
 
@@ -190,6 +190,23 @@ function openSheet(g){closeSheet();const A=g.role==='admin',h=HS[g.gid],m=h&&h.e
   const sc=$('sc');if(sc)sc.onclick=async()=>{let ok=false;try{await navigator.clipboard.writeText(vc);ok=true}catch(e){try{const ta=document.createElement('textarea');ta.value=vc;document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');ta.remove()}catch(_){}}
     sc.textContent=ok?'کپی شد ✓':'کپی ممکن نشد';setTimeout(()=>closeSheet(),700)};
   armed($('sd'),()=>{closeSheet();A?removeGroup(g):leaveGroup(g)})}
+async function copyTxt(v){try{await navigator.clipboard.writeText(v);return true}catch(e){try{const t=document.createElement('textarea');t.value=v;document.body.appendChild(t);t.select();const ok=document.execCommand('copy');t.remove();return ok}catch(_){return false}}}
+function openMenu(){closeSheet();const A=adm(),m=model(),vc=m.vc,nm=m.name||cur.name;let pv=m.priv;
+  const pt=()=>pv?'🔒 حالت خصوصی: روشن':'🔓 حالت خصوصی: خاموش';
+  const d=document.createElement('div');d.id='shb';
+  d.innerHTML=`<div id="shs"><div class="shn">${esc(nm)}</div>`+
+    (A?`<button class="sb" id="mpv">${pt()}</button>`:`<div class="s" style="text-align:center;margin-top:8px"><b id="mpt">${pt()}</b> (فقط ادمین می‌تواند تغییر دهد)</div>`)+
+    `<div class="s" style="text-align:center;margin-top:6px">وقتی روشن باشد، هر عضو فقط هزینه‌ها و بدهی/طلب خودش را می‌بیند.</div>`+
+    (vc?`<button class="sb" id="mpc">کپی شناسه گروه (<bdi dir="ltr">${esc(vc)}</bdi>)</button><button class="sb" id="mps">ارسال دعوت به گروه</button>`:'')+
+    `<button class="sb dn" id="mpd">${A?'حذف گروه':'ترک گروه'}</button><div class="s" style="text-align:center;margin-top:6px">${A?'با حذف گروه، اطلاعات آن برای همه‌ی اعضا پاک می‌شود.':'فقط از لیست گروه‌های شما حذف می‌شود.'}</div><button class="sb" id="sx">انصراف</button></div>`;
+  document.body.appendChild(d);try{history.pushState({sh:1},'');shPush=true}catch(e){}
+  d.onclick=e=>{if(e.target===d)closeSheet()};$('sx').onclick=()=>closeSheet();
+  const pb=$('mpv');if(pb)pb.onclick=async()=>{pv=!pv;pb.textContent=pt();try{await db.doc('gx_'+cur.gid+'/priv').set({t:'priv',v:pv,at:Date.now()})}catch(e){pv=!pv;pb.textContent=pt()}};
+  const cb=$('mpc');if(cb)cb.onclick=async()=>{const ok=await copyTxt(vc);cb.textContent=ok?'کپی شد ✓':'کپی ممکن نشد';setTimeout(()=>closeSheet(),700)};
+  const sb=$('mps');if(sb)sb.onclick=async()=>{const txt='به گروه «'+nm+'» در دونگ بپیوندید.\nکد گروه: '+vc+'\n'+location.href.split('#')[0];
+    if(navigator.share){try{await navigator.share({text:txt});closeSheet();return}catch(e){if(e&&e.name==='AbortError')return}}
+    const ok=await copyTxt(txt);sb.textContent=ok?'متن دعوت کپی شد ✓':'کپی ممکن نشد';setTimeout(()=>closeSheet(),900)};
+  armed($('mpd'),()=>{closeSheet();A?removeGroup():leaveGroup()})}
 let busy=false;
 const setBtn=(id,on,t)=>{const b=$(id);if(b){b.disabled=on;if(t)b.textContent=t}};
 async function mkGroup(){if(busy)return;const n=$('gn').value.trim(),e=$('e1');e.style.color='';e.textContent='';if(!n)return e.textContent='نام گروه را بنویسید.';
@@ -229,7 +246,7 @@ async function removeGroup(g){g=g||cur;try{await wipe(g.gid);await db.doc(pcol()
 function afterGone(){if(view==='group')homeShell();else if(view==='home'){syncSubs();renderHome()}}
 
 function groupShell(){view='group';
-  $('app').innerHTML=`<div class="sh"><button class="g" id="bk">→ بازگشت</button><span class="gid" id="gid"></span><button class="g" id="dg">حذف گروه</button></div>
+  $('app').innerHTML=`<div class="sh"><button class="g" id="bk">→ بازگشت</button><span class="gid" id="gid"></span><button class="g" id="mn" aria-label="منو" style="padding:8px 10px;line-height:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
   <div class="th"><h1 id="gt"></h1><div class="mr"><span id="meh"></span><button class="mb" id="mb">👥 اعضا <span id="mc"></span><span class="ar2" id="mar">${CH}</span></button></div></div>
   <div class="c" id="mp" style="display:none"><div id="mel"><div class="lab">شما کدام عضو هستید؟</div><span id="mep"><select id="me"></select></span></div>
   <div class="chips" id="plist"></div><div class="r" id="addp"><input type="text" id="pn" placeholder="نام عضو جدید"><button id="addP">افزودن</button></div>
@@ -253,7 +270,7 @@ function groupShell(){view='group';
    ['onpointerup','onpointercancel','onpointerleave'].forEach(ev=>bb[ev]=sp);bb.oncontextmenu=e=>e.preventDefault();bb.style.touchAction='manipulation';bb.style.userSelect='none';bb.style.webkitUserSelect='none'}
   $('fab').onclick=()=>{const sf=$('sf');sf.querySelector('.ab').style.display='';sf.querySelector('.ah').classList.add('open');sf.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>{const t=$('tt');if(t)t.focus({preventScroll:true})},400)};
   try{new IntersectionObserver(es=>{$('fab').style.display=es[0].isIntersecting?'none':''},{threshold:.15}).observe($('sf'))}catch(e){}
-  $('bk').onclick=homeShell;armed($('dg'),()=>adm()?removeGroup():leaveGroup());
+  $('bk').onclick=homeShell;$('mn').onclick=openMenu;
   $('gid').onclick=()=>{const v=$('gid').dataset.c;if(!v)return;try{navigator.clipboard.writeText(v)}catch(e){try{const t=document.createElement('textarea');t.value=v;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}catch(x){}}
     const h=$('gid').innerHTML;$('gid').textContent='کپی شد ✓';setTimeout(()=>{$('gid').innerHTML=h},1200)};
   $('mb').onclick=()=>{const p=$('mp'),o=p.style.display==='none';p.style.display=o?'':'none';$('mar').classList.toggle('open',o)};
@@ -379,7 +396,9 @@ function startEdit(e){const m=model();st.edit={id:e.id,_d:e._d,at:e.at,by:e.by};
 
 function renderParts(){if(!$('plist'))return;banner();const m=model(),A=adm(),J=P.find(x=>x._d===cur.pid)||{};$('gt').textContent=m.name;
   if(J.me&&!m.claims[J.me]&&!st.cl){st.cl=1;db.doc('gx_'+cur.gid+'/claim_'+J.me).set({t:'claim',pid:J.me,by:myId,at:Date.now()}).catch(()=>{})}
-  $('rl').textContent=A?'👑 شما ادمین هستید':'';
+  const PV=m.priv,meI=J.me&&m.people.some(p=>p.id===J.me)?J.me:null,inv=e=>!!meI&&(e.t==='pay'?(e.from===meI||e.to===meI):(e.payer===meI||meI in (e.shares||{})||e.by===meI));
+  $('rl').textContent=(A?'👑 شما ادمین هستید':'')+(PV?(A?' · ':'')+'🔒 حالت خصوصی روشن است':'');
+  {const t=document.querySelector('#sl .ah span');if(t)t.textContent=PV?'هزینه‌های مرتبط با شما':'کل هزینه‌ها'}
   const canW=canWrite();document.body.classList.toggle('nw',!canW);
   $('sf').style.display=(canW||st.edit)?'':'none';
   {const px=$('payx');if(px)px.parentNode.style.display=canW?'':'none';if(!canW)$('payf').style.display='none'}
@@ -403,18 +422,19 @@ function renderParts(){if(!$('plist'))return;banner();const m=model(),A=adm(),J=
   const bal=balances(m),nm=id=>(m.people.find(p=>p.id===id)||{name:'؟'}).name;
   {const o=m.people.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join(''),f=$('pf'),t=$('pt'),a=f.value,b=t.value;f.innerHTML=o;t.innerHTML=o;if(a)f.value=a;if(b)t.value=b;else if(t.options.length>1)t.selectedIndex=1}
   $('mine').innerHTML=J.me&&J.me in bal?'وضع شما: '+balTxt(bal[J.me]):'';
-  $('bal').innerHTML=m.people.length?m.people.map(p=>`<div class="row"><span>${esc(p.name)}</span>${balTxt(bal[p.id])}</div>`).join(''):'<div class="s">هنوز عضوی نیست.</div>';
+  $('bal').innerHTML=PV?(meI?`<div class="row"><span>${esc(nm(meI))}</span>${balTxt(bal[meI])}</div>`:'<div class="s">برای دیدن وضع حساب، اول نام خودتان را از بخش «اعضا» انتخاب کنید.</div>'):m.people.length?m.people.map(p=>`<div class="row"><span>${esc(p.name)}</span>${balTxt(bal[p.id])}</div>`).join(''):'<div class="s">هنوز عضوی نیست.</div>';
   const cr=[],de=[];m.people.forEach(p=>{const v=Math.round(bal[p.id]);if(v>0)cr.push({id:p.id,v});else if(v<0)de.push({id:p.id,v:-v})});
   cr.sort((a,b)=>b.v-a.v);de.sort((a,b)=>b.v-a.v);const tx=[];let i=0,j=0;
   while(i<de.length&&j<cr.length){const x=Math.min(de[i].v,cr[j].v);if(x>0)tx.push({f:de[i].id,t:cr[j].id,a:x});de[i].v-=x;cr[j].v-=x;if(!de[i].v)i++;if(!cr[j].v)j++}
-  $('set').innerHTML=tx.length?'<div class="lab" style="margin-top:12px">پیشنهاد پرداخت:</div>'+tx.map((t,k)=>`<div class="row"><span>${esc(nm(t.f))} ← ${tm(t.a)} ← ${esc(nm(t.t))}</span>${canW?'<button class="g" data-pay="'+k+'">ثبت پرداخت</button>':''}</div>`).join(''):'';
-  $('set').querySelectorAll('button[data-pay]').forEach(b=>armed(b,async()=>{const t=tx[b.dataset.pay];try{await put({t:'pay',id:rid(),from:t.f,to:t.t,amount:t.a,date:today()})}catch(e){}}));
-  const all=[...m.exps,...m.pays].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.at-a.at),rw=(k,v)=>`<div class="row"><span>${k}</span><span>${v}</span></div>`;
+  const vtx=PV?tx.filter(t=>meI&&(t.f===meI||t.t===meI)):tx;
+  $('set').innerHTML=vtx.length?'<div class="lab" style="margin-top:12px">پیشنهاد پرداخت:</div>'+vtx.map((t,k)=>`<div class="row"><span>${esc(nm(t.f))} ← ${tm(t.a)} ← ${esc(nm(t.t))}</span>${canW?'<button class="g" data-pay="'+k+'">ثبت پرداخت</button>':''}</div>`).join(''):'';
+  $('set').querySelectorAll('button[data-pay]').forEach(b=>armed(b,async()=>{const t=vtx[b.dataset.pay];try{await put({t:'pay',id:rid(),from:t.f,to:t.t,amount:t.a,date:today()})}catch(e){}}));
+  const all0=[...m.exps,...m.pays].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.at-a.at),all=PV?all0.filter(inv):all0,rw=(k,v)=>`<div class="row"><span>${k}</span><span>${v}</span></div>`,emp=PV?(meI?'هنوز هزینه‌ای مربوط به شما ثبت نشده.':'برای دیدن هزینه‌ها، اول نام خودتان را از بخش «اعضا» انتخاب کنید.'):'هنوز هزینه‌ای ثبت نشده.';
   $('list').innerHTML=all.length?all.map(e=>{const o=st.open===e.id,pay=e.t==='pay';
     const head=pay?`<div><b>💸 پرداخت</b><div class="s">${fd(e.date||'')} · ${esc(nm(e.from))} به ${esc(nm(e.to))}</div></div>`:`<div><b>${esc(e.title)}</b>${e.custom?'<span class="b pr">نامساوی</span>':''}<div class="s">${fd(e.date||'')} · ${esc(nm(e.payer))} پرداخت کرد</div>${e.by?`<div class="s">ثبت‌کننده: ${esc(nm(e.by))}</div>`:''}</div>`;
     let det='';
     if(o)det='<div class="det">'+(pay?rw('تاریخ',fd(e.date||''))+rw('پرداخت‌کننده',esc(nm(e.from)))+rw('گیرنده',esc(nm(e.to)))+rw('مبلغ',tm(e.amount)):rw('تاریخ',fd(e.date||''))+rw('مبلغ کل',tm(e.amount))+rw('پرداخت‌کننده',esc(nm(e.payer)))+(e.by?rw('ثبت‌کننده',esc(nm(e.by))):'')+rw('نوع تقسیم',e.custom?'دلخواه':'مساوی')+'<div class="lab">سهم هر نفر:</div>'+Object.entries(e.shares||{}).map(([i,v])=>rw(esc(nm(i)),tm(v))).join(''))+(A&&!e._pending?`<div style="margin-top:6px">${pay?'':`<button class="g" data-edit="${esc(e.id)}">✏️ ویرایش</button>`}<button class="g" data-del="${esc(e.id)}">${pay?'حذف این پرداخت':'حذف این هزینه'}</button></div>`:'')+'</div>';
-    return `<div class="row" style="cursor:pointer" data-id="${esc(e.id)}">${head}<div style="white-space:nowrap">${e._pending?'<span class="b pr">⏳</span>':''}${tm(e.amount)} <span class="ar2${o?' open':''}">${CH}</span></div></div>`+det}).join(''):'<div class="s">هنوز هزینه‌ای ثبت نشده.</div>';
+    return `<div class="row" style="cursor:pointer" data-id="${esc(e.id)}">${head}<div style="white-space:nowrap">${e._pending?'<span class="b pr">⏳</span>':''}${tm(e.amount)} <span class="ar2${o?' open':''}">${CH}</span></div></div>`+det}).join(''):`<div class="s">${emp}</div>`;
   $('list').querySelectorAll('.row[data-id]').forEach(r=>r.onclick=()=>{st.open=st.open===r.dataset.id?null:r.dataset.id;renderParts()});
   $('list').querySelectorAll('button[data-del]').forEach(b=>armed(b,async()=>{const e=all.find(x=>x.id===b.dataset.del);if(!e)return;try{if(e._d)await db.doc('gx_'+cur.gid+'/'+e._d).delete();st.open=null}catch(x){}}));$('list').querySelectorAll('button[data-edit]').forEach(b=>b.onclick=()=>{const e=m.exps.find(x=>x.id===b.dataset.edit);if(e)startEdit(e)});
   renderMine(m,J,bal,nm,all,rw)}
