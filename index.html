@@ -240,7 +240,7 @@ function openGroup(g){stopSubs();if(!gPush){try{history.pushState({g:1},'');gPus
 const adm=()=>cur&&cur.role==='admin';
 const model=()=>{const have=new Set(cur.entries.map(e=>e.id)),pend=OBQ.filter(x=>x.gid===cur.gid&&!have.has(x.data.id)).map(x=>({...x.data,_pending:1})),m=build(cur.entries.concat(pend));m.name=m.name||cur.name;return m};
 const canWrite=()=>{if(!cur)return false;const J=P.find(x=>x._d===cur.pid)||{};return !!J.me&&model().people.some(p=>p.id===J.me)};
-async function put(o){if((o.t==='exp'||o.t==='pay')&&!canWrite())throw 'nomember';o.at=Date.now();if(!o.id)o.id=rid();const path='gx_'+cur.gid+'/'+o.id,q=()=>{OBQ.push({path,gid:cur.gid,data:o});obSave();banner();renderParts()};
+async function put(o){if((o.t==='exp'||o.t==='pay')&&!canWrite())throw 'nomember';if(o.t==='pay'&&!o.by){const Jm=P.find(x=>x._d===cur.pid);if(Jm&&Jm.me)o.by=Jm.me}o.at=Date.now();if(!o.id)o.id=rid();const path='gx_'+cur.gid+'/'+o.id,q=()=>{OBQ.push({path,gid:cur.gid,data:o});obSave();banner();renderParts()};
   try{await tmo(db.doc(path).set(o),7000)}catch(e){if(transient(e))q();else throw e}}
 const sec=(k,id,t,b,open)=>`<div class="c acc" id="${id}"><div class="ah${open?' open':''}"><span>${t}</span><span class="ar">${CH}</span></div><div class="ab" style="display:${open?'':'none'}">${b}</div></div>`;
 async function wipe(gid){if(live){try{await w({op:'wipe',gid});return}catch(e){}}
@@ -261,8 +261,7 @@ function groupShell(){view='group';
   <div class="sub" id="rl"></div><div class="s" id="vn" style="display:none;margin:-6px 0 12px;padding:8px 10px;border-radius:10px;background:var(--pvb);color:var(--pv)"></div><div id="mine" style="margin:-8px 0 14px"></div><div id="obn" class="s" style="display:none;text-align:center;margin:-6px 0 12px;color:var(--pv)"></div>`+
   sec('s','ss','تسویه حساب',`<div id="bal"></div><div id="set"></div><div style="text-align:center;margin-top:6px"><button class="g" id="payx">+ ثبت پرداخت دلخواه</button></div>
   <div id="payf" style="display:none"><div class="lab">چه کسی پرداخت کرد</div><select id="pf"></select><div class="lab">به چه کسی</div><select id="pt"></select><input type="text" id="pa" inputmode="numeric" placeholder="مبلغ (تومان)"><button id="pgo" style="width:100%">ثبت پرداخت</button><div class="s err" id="perr"></div></div>`,true)+
-  sec('l','sl','کل هزینه‌ها','<div id="list"></div>')+
-  sec('mm','smm','هزینه‌های من','<div id="mlist"></div>')+
+  sec('l','sl','هزینه‌ها','<div id="mlist"></div>')+
   sec('f','sf','<span class="plc">'+PL+'</span>ثبت هزینه جدید',`<div id="editb" class="s" style="display:none;color:var(--pv);margin-bottom:8px">✏️ در حال ویرایش هزینه — <button class="g" id="cancelE">انصراف</button></div><input type="text" id="tt" placeholder="بابت (مثلاً شام)">
   <div class="r"><input type="text" id="am" inputmode="numeric" placeholder="مبلغ (تومان)"><input type="text" id="dt" dir="ltr" value="${fd(today())}"></div>
   <div class="lab">پرداخت‌کننده</div><select id="py"></select>
@@ -403,8 +402,8 @@ function startEdit(e){const m=model();st.edit={id:e.id,_d:e._d,at:e.at,by:e.by};
   renderParts();$('sf').scrollIntoView({behavior:'smooth'})}
 
 function renderParts(){if(!$('plist'))return;banner();const m=model(),A=adm(),J=P.find(x=>x._d===cur.pid)||{};$('gt').textContent=m.name;
-  const meI=J.me&&m.people.some(p=>p.id===J.me)?J.me:null,inv=e=>!!meI&&(e.t==='pay'?(e.from===meI||e.to===meI):(e.payer===meI||meI in (e.shares||{})||e.by===meI));
-  {const t=document.querySelector('#sl .ah span');if(t)t.textContent='هزینه‌های مرتبط با شما'}
+  const meI=J.me&&m.people.some(p=>p.id===J.me)?J.me:null,inv=e=>!!meI&&(e.t==='pay'?(e.from===meI||e.to===meI||e.by===meI):(e.payer===meI||meI in (e.shares||{})||e.by===meI));
+
   if(J.me&&!m.claims[J.me]&&!st.cl){st.cl=1;db.doc('gx_'+cur.gid+'/claim_'+J.me).set({t:'claim',pid:J.me,by:myId,at:Date.now()}).catch(()=>{})}
   $('rl').textContent=A?'👑 شما ادمین هستید':'';
   const canW=canWrite();document.body.classList.toggle('nw',!canW);
@@ -438,31 +437,26 @@ function renderParts(){if(!$('plist'))return;banner();const m=model(),A=adm(),J=
   $('set').innerHTML=tx.length?'<div class="lab" style="margin-top:12px">پیشنهاد پرداخت:</div>'+tx.map((t,k)=>`<div class="row"><span>${esc(nm(t.f))} ← ${tm(t.a)} ← ${esc(nm(t.t))}</span>${canW?'<button class="g" data-pay="'+k+'">ثبت پرداخت</button>':''}</div>`).join(''):'';
   $('set').querySelectorAll('button[data-pay]').forEach(b=>armed(b,async()=>{const t=tx[b.dataset.pay];try{await put({t:'pay',id:rid(),from:t.f,to:t.t,amount:t.a,date:today()})}catch(e){}}));
   const all=[...mv.exps,...mv.pays].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.at-a.at),rw=(k,v)=>`<div class="row"><span>${k}</span><span>${v}</span></div>`,emp=meI?'هنوز هزینه‌ای مربوط به شما ثبت نشده.':'برای دیدن هزینه‌ها، اول نام خودتان را از بخش «اعضا» انتخاب کنید.';
-  $('list').innerHTML=all.length?all.map(e=>{const o=st.open===e.id,pay=e.t==='pay';
-    const head=pay?`<div><b>💸 پرداخت</b><div class="s">${fd(e.date||'')} · ${esc(nm(e.from))} به ${esc(nm(e.to))}</div></div>`:`<div><b>${esc(e.title)}</b>${e.custom?'<span class="b pr">نامساوی</span>':''}<div class="s">${fd(e.date||'')} · ${esc(nm(e.payer))} پرداخت کرد</div>${e.by?`<div class="s">ثبت‌کننده: ${esc(nm(e.by))}</div>`:''}</div>`;
-    let det='';
-    if(o)det='<div class="det">'+(pay?rw('تاریخ',fd(e.date||''))+rw('پرداخت‌کننده',esc(nm(e.from)))+rw('گیرنده',esc(nm(e.to)))+rw('مبلغ',tm(e.amount)):rw('تاریخ',fd(e.date||''))+rw('مبلغ کل',tm(e.amount))+rw('پرداخت‌کننده',esc(nm(e.payer)))+(e.by?rw('ثبت‌کننده',esc(nm(e.by))):'')+rw('نوع تقسیم',e.custom?'دلخواه':'مساوی')+'<div class="lab">سهم هر نفر:</div>'+Object.entries(e.shares||{}).map(([i,v])=>rw(esc(nm(i)),tm(v))).join(''))+(A&&!e._pending?`<div style="margin-top:6px">${pay?'':`<button class="g" data-edit="${esc(e.id)}">✏️ ویرایش</button>`}<button class="g" data-del="${esc(e.id)}">${pay?'حذف این پرداخت':'حذف این هزینه'}</button></div>`:'')+'</div>';
-    return `<div class="row" style="cursor:pointer" data-id="${esc(e.id)}">${head}<div style="white-space:nowrap">${e._pending?'<span class="b pr">⏳</span>':''}${tm(e.amount)} <span class="ar2${o?' open':''}">${CH}</span></div></div>`+det}).join(''):`<div class="s">${emp}</div>`;
-  $('list').querySelectorAll('.row[data-id]').forEach(r=>r.onclick=()=>{st.open=st.open===r.dataset.id?null:r.dataset.id;renderParts()});
-  $('list').querySelectorAll('button[data-del]').forEach(b=>armed(b,async()=>{const e=all.find(x=>x.id===b.dataset.del);if(!e)return;try{if(e._d)await db.doc('gx_'+cur.gid+'/'+e._d).delete();st.open=null}catch(x){}}));$('list').querySelectorAll('button[data-edit]').forEach(b=>b.onclick=()=>{const e=m.exps.find(x=>x.id===b.dataset.edit);if(e)startEdit(e)});
   renderMine(m,J,bal,nm,all,rw)}
 function renderMine(m,J,bal,nm,all,rw){const L=$('mlist');if(!L)return;
   const me=J.me&&m.people.some(p=>p.id===J.me)?J.me:null;
   if(!me){L.innerHTML='<div class="s">برای دیدن هزینه‌های خودتان، اول نام خودتان را از بخش «اعضا» انتخاب کنید.</div>';return}
-  const my=all.filter(e=>e.t==='pay'?(e.from===me||e.to===me):(e.payer===me||me in (e.shares||{}))),xs=my.filter(e=>e.t!=='pay'),
+  const my=all,A=adm(),xs=my.filter(e=>e.t!=='pay'),
     paid=xs.reduce((a,e)=>a+(e.payer===me?e.amount:0),0),sh=xs.reduce((a,e)=>a+((e.shares||{})[me]||0),0);
   let h='<div class="det">'+rw('جمع پرداختی شما برای هزینه‌ها',tm(paid))+rw('جمع سهم شما از هزینه‌ها',tm(sh))+rw('وضع شما',balTxt(bal[me]))+'</div>';
-  h+=my.length?my.map(e=>{const o=st.openM===e.id,pay=e.t==='pay',ch=`<span class="ar2${o?' open':''}">${CH}</span>`;let head,right,det='';
+  h+=my.length?my.map(e=>{const o=st.openM===e.id,pay=e.t==='pay',ch=`<span class="ar2${o?' open':''}">${CH}</span>`;let head,right,det='';const ab=((A||(e.by&&e.by===me))&&!e._pending)?`<div style="margin-top:6px">${pay?'':`<button class="g" data-edit="${esc(e.id)}">✏️ ویرایش</button>`}<button class="g" data-del="${esc(e.id)}">${pay?'حذف این پرداخت':'حذف این هزینه'}</button></div>`:'';
     if(pay){const out=e.from===me;
       head=`<div><b>💸 پرداخت</b><div class="s">${fd(e.date||'')} · ${esc(nm(e.from))} به ${esc(nm(e.to))}</div></div>`;
       right=`<div class="${out?'pos':'neg'}" style="white-space:nowrap">${out?'+':'−'} ${tm(e.amount)}</div>`;
-      if(o)det='<div class="det">'+rw('تاریخ',fd(e.date||''))+rw('پرداخت‌کننده',esc(nm(e.from)))+rw('گیرنده',esc(nm(e.to)))+rw('مبلغ',tm(e.amount))+'</div>'}
+      if(o)det='<div class="det">'+rw('تاریخ',fd(e.date||''))+rw('پرداخت‌کننده',esc(nm(e.from)))+rw('گیرنده',esc(nm(e.to)))+rw('مبلغ',tm(e.amount))+ab+'</div>'}
     else{const my1=(e.shares||{})[me]||0,net=(e.payer===me?e.amount:0)-my1;
       head=`<div><b>${esc(e.title)}</b>${e.custom?'<span class="b pr">نامساوی</span>':''}<div class="s">${fd(e.date||'')} · ${e.payer===me?'شما پرداخت کردید':esc(nm(e.payer))+' پرداخت کرد'}</div></div>`;
       right=`<div style="text-align:left;white-space:nowrap"><div>سهم شما: ${tm(my1)}</div><div class="s">از ${tm(e.amount)}</div></div>`;
-      if(o)det='<div class="det">'+rw('تاریخ',fd(e.date||''))+rw('مبلغ کل',tm(e.amount))+rw('پرداخت‌کننده',esc(nm(e.payer)))+(e.by?rw('ثبت‌کننده',esc(nm(e.by))):'')+rw('نوع تقسیم',e.custom?'دلخواه':'مساوی')+rw('سهم شما',tm(my1))+rw('تأثیر روی وضع شما',balTxt(net))+'<div class="lab">سهم هر نفر:</div>'+Object.entries(e.shares||{}).map(([i,v])=>rw(esc(nm(i)),tm(v))).join('')+'</div>'}
-    return `<div class="row" style="cursor:pointer" data-mid="${esc(e.id)}">${head}<div style="display:flex;align-items:center;gap:6px">${right}${ch}</div></div>`+det}).join(''):'<div class="s">هنوز هزینه‌ای برای شما ثبت نشده.</div>';
+      if(o)det='<div class="det">'+rw('تاریخ',fd(e.date||''))+rw('مبلغ کل',tm(e.amount))+rw('پرداخت‌کننده',esc(nm(e.payer)))+(e.by?rw('ثبت‌کننده',esc(nm(e.by))):'')+rw('نوع تقسیم',e.custom?'دلخواه':'مساوی')+rw('سهم شما',tm(my1))+rw('تأثیر روی وضع شما',balTxt(net))+'<div class="lab">سهم هر نفر:</div>'+Object.entries(e.shares||{}).map(([i,v])=>rw(esc(nm(i)),tm(v))).join('')+ab+'</div>'}
+    return `<div class="row" style="cursor:pointer" data-mid="${esc(e.id)}">${head}<div style="display:flex;align-items:center;gap:6px">${e._pending?'<span class="b pr">⏳</span>':''}${right}${ch}</div></div>`+det}).join(''):'<div class="s">هنوز هزینه‌ای برای شما ثبت نشده.</div>';
   L.innerHTML=h;
+  L.querySelectorAll('button[data-del]').forEach(b=>armed(b,async()=>{const e=all.find(x=>x.id===b.dataset.del);if(!e)return;try{if(e._d)await db.doc('gx_'+cur.gid+'/'+e._d).delete();st.openM=null}catch(x){}}));
+  L.querySelectorAll('button[data-edit]').forEach(b=>b.onclick=()=>{const e=m.exps.find(x=>x.id===b.dataset.edit);if(e)startEdit(e)});
   L.querySelectorAll('.row[data-mid]').forEach(r=>r.onclick=()=>{st.openM=st.openM===r.dataset.mid?null:r.dataset.mid;renderParts()})}
 </script>
 </body>
