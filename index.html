@@ -40,6 +40,13 @@ button.g{background:transparent;color:var(--mut);padding:4px 8px;font-weight:400
 #shs .shn{font-weight:800;font-size:17px;text-align:center;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #shs .sb{display:block;width:100%;text-align:center;background:var(--bg);color:var(--tx);border:1px solid var(--bd);margin-top:8px}
 #shs .sb.dn{color:var(--no)}
+#cfb{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:70;display:flex;align-items:center;justify-content:center;padding:20px}
+#cfd{width:100%;max-width:340px;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+#cfd .ct{font-weight:800;font-size:17px;margin-bottom:8px}
+#cfd .cr{display:flex;gap:10px;margin-top:16px}
+#cfd .cr button{flex:1}
+#cfd .cy{background:var(--no);color:#fff}
+#cfd .cn{background:var(--bg);color:var(--tx);border:1px solid var(--bd)}
 .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--bd);gap:8px}
 .row:first-of-type{border-top:0}
 .b{font-size:11px;border-radius:8px;padding:1px 8px;margin-inline-start:6px}
@@ -76,7 +83,7 @@ body.nw #fab{display:none!important}
 const API=window.DONG_API||'';
 const live=/^https?:\/\//.test(API)&&!/YOUR/i.test(API);
 let UID=null;try{UID=localStorage.getItem('dong_uid');if(!UID){UID=[...crypto.getRandomValues(new Uint8Array(16))].map(x=>x.toString(16).padStart(2,'0')).join('');localStorage.setItem('dong_uid',UID)}}catch(e){}
-const post=async b=>{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(b)});const j=await r.json();if(!r.ok||j.error)throw new Error(j.error||'http');return j};
+const post=async b=>{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({uid:UID},b))});const j=await r.json();if(!r.ok||j.error)throw new Error(j.error||'http');return j};
 const split=p=>{const i=p.lastIndexOf('/');return [p.slice(0,i),p.slice(i+1)]};
 const ws=j=>({docs:j.docs.map(d=>({id:d.id,data:()=>d.data,pending:false})),empty:!j.docs.length,metadata:{fromCache:false}});
 const subs=new Map();let seq=0,timer=null,inflight=false,again=false;
@@ -145,8 +152,8 @@ function armed(b,fn){let t;b.onclick=()=>{if(b.dataset.a){clearTimeout(t);fn();r
 const joinedList=()=>{const d=new Set(P.filter(e=>e.t==='del').map(e=>e.ref));return P.filter(e=>e.t==='joined'&&e.v===2&&!d.has(e.id)).sort((a,b)=>b.at-a.at)};
 const rc=()=>String(1000+Math.floor(Math.random()*9000));
 async function freeCode(){for(let k=0;k<40;k++){const c=rc();if(!(await db.doc('codes/'+c).get()).exists)return c}throw 0}
-function build(es){es=es.slice().sort((a,b)=>a.at-b.at);const d=new Set(es.filter(e=>e.t==='del').map(e=>e.ref)),meta=es.find(e=>e.t==='meta'),lk=es.filter(e=>e.t==='lock').pop(),pv=es.filter(e=>e.t==='priv').pop(),cl={};es.filter(e=>e.t==='claim').forEach(c=>cl[c.pid]=c.by);
-  return {people:es.filter(e=>e.t==='person'&&!d.has(e.id)),exps:es.filter(e=>e.t==='exp'&&!d.has(e.id)),pays:es.filter(e=>e.t==='pay'&&!d.has(e.id)),name:meta&&meta.name,vc:meta&&meta.vc,ac:meta&&meta.ac,locked:!!(lk&&lk.v),priv:!!(pv&&pv.v),claims:cl}}
+function build(es){es=es.slice().sort((a,b)=>a.at-b.at);const d=new Set(es.filter(e=>e.t==='del').map(e=>e.ref)),meta=es.find(e=>e.t==='meta'),lk=es.filter(e=>e.t==='lock').pop(),cl={};es.filter(e=>e.t==='claim').forEach(c=>cl[c.pid]=c.by);
+  return {people:es.filter(e=>e.t==='person'&&!d.has(e.id)),exps:es.filter(e=>e.t==='exp'&&!d.has(e.id)),pays:es.filter(e=>e.t==='pay'&&!d.has(e.id)),name:meta&&meta.name,vc:meta&&meta.vc,ac:meta&&meta.ac,locked:!!(lk&&lk.v),claims:cl}}
 function balances(m){const b={};m.people.forEach(p=>b[p.id]=0);m.exps.forEach(e=>{if(!(e.payer in b))return;b[e.payer]+=e.amount;Object.entries(e.shares||{}).forEach(([i,v])=>{if(i in b)b[i]-=v})});(m.pays||[]).forEach(p=>{if(p.from in b)b[p.from]+=p.amount;if(p.to in b)b[p.to]-=p.amount});return b}
 const balTxt=v=>Math.abs(v)<0.5?'<span>تسویه‌شده ✓</span>':v>0?`<span class="pos">بستانکار ${tm(v)}</span>`:`<span class="neg">بدهکار ${tm(-v)}</span>`;
 
@@ -178,7 +185,10 @@ function renderHome(){const L=$('gl');if(!L)return;const gs=joinedList();
     r.onpointerup=r.onpointercancel=r.onpointerleave=cl});
   if(gs.length)L.insertAdjacentHTML('beforeend','<div class="s" style="text-align:center;margin-top:8px">برای گزینه‌های بیشتر (حذف و…)، روی گروه نگه دارید</div>')}
 let lpDone=false,shPush=false;
-function closeSheet(pop){const b=$('shb');if(b)b.remove();if(shPush){shPush=false;if(!pop){skipN++;try{history.back()}catch(e){skipN--}}}}
+function confirmBox(title,msg,yes,fn){const o=$('cfb');if(o)o.remove();const d=document.createElement('div');d.id='cfb';
+  d.innerHTML=`<div id="cfd"><div class="ct">${title}</div><div class="s">${msg}</div><div class="cr"><button class="cy" id="cfy">${yes}</button><button class="cn" id="cfn">بیخیال</button></div></div>`;
+  document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.remove()};$('cfn').onclick=()=>d.remove();$('cfy').onclick=()=>{d.remove();fn()}}
+function closeSheet(pop){const c=$('cfb');if(c)c.remove();const b=$('shb');if(b)b.remove();if(shPush){shPush=false;if(!pop){skipN++;try{history.back()}catch(e){skipN--}}}}
 function openSheet(g){closeSheet();const A=g.role==='admin',h=HS[g.gid],m=h&&h.es?build(h.es):null,vc=m&&m.vc;
   const d=document.createElement('div');d.id='shb';
   d.innerHTML=`<div id="shs"><div class="shn">${esc(g.name)}</div><button class="sb" id="so">باز کردن گروه</button>${vc?`<button class="sb" id="sc">کپی شناسه گروه (<bdi dir="ltr">${esc(vc)}</bdi>)</button>`:''}<button class="sb dn" id="sd">${A?'حذف گروه':'ترک گروه'}</button><div class="s" style="text-align:center;margin-top:6px">${A?'با حذف گروه، اطلاعات آن برای همه‌ی اعضا پاک می‌شود.':'فقط از لیست گروه‌های شما حذف می‌شود.'}</div><button class="sb" id="sx">انصراف</button></div>`;
@@ -189,24 +199,20 @@ function openSheet(g){closeSheet();const A=g.role==='admin',h=HS[g.gid],m=h&&h.e
   $('so').onclick=()=>{const had=shPush;shPush=false;d.remove();if(had)gPush=true;openGroup(g)};
   const sc=$('sc');if(sc)sc.onclick=async()=>{let ok=false;try{await navigator.clipboard.writeText(vc);ok=true}catch(e){try{const ta=document.createElement('textarea');ta.value=vc;document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');ta.remove()}catch(_){}}
     sc.textContent=ok?'کپی شد ✓':'کپی ممکن نشد';setTimeout(()=>closeSheet(),700)};
-  armed($('sd'),()=>{closeSheet();A?removeGroup(g):leaveGroup(g)})}
+  $('sd').onclick=()=>confirmBox(A?'حذف گروه «'+esc(g.name)+'»؟':'ترک گروه «'+esc(g.name)+'»؟',A?'اطلاعات گروه برای همه‌ی اعضا پاک می‌شود و برگشت ندارد.':'فقط از لیست گروه‌های شما حذف می‌شود.',A?'آره، حذف کن':'آره، ترک کن',()=>{closeSheet();A?removeGroup(g):leaveGroup(g)})}
 async function copyTxt(v){try{await navigator.clipboard.writeText(v);return true}catch(e){try{const t=document.createElement('textarea');t.value=v;document.body.appendChild(t);t.select();const ok=document.execCommand('copy');t.remove();return ok}catch(_){return false}}}
-function openMenu(){closeSheet();const A=adm(),m=model(),vc=m.vc,nm=m.name||cur.name;let pv=m.priv;
-  const pt=()=>pv?'🔒 حالت خصوصی: روشن':'🔓 حالت خصوصی: خاموش';
+function openMenu(){closeSheet();const A=adm(),m=model(),vc=m.vc,nm=m.name||cur.name;
   const d=document.createElement('div');d.id='shb';
   d.innerHTML=`<div id="shs"><div class="shn">${esc(nm)}</div>`+
-    (A?`<button class="sb" id="mpv">${pt()}</button>`:`<div class="s" style="text-align:center;margin-top:8px"><b id="mpt">${pt()}</b> (فقط ادمین می‌تواند تغییر دهد)</div>`)+
-    `<div class="s" style="text-align:center;margin-top:6px">وقتی روشن باشد، هر عضو فقط هزینه‌ها و بدهی/طلب خودش را می‌بیند.</div>`+
     (vc?`<button class="sb" id="mpc">کپی شناسه گروه (<bdi dir="ltr">${esc(vc)}</bdi>)</button><button class="sb" id="mps">ارسال دعوت به گروه</button>`:'')+
     `<button class="sb dn" id="mpd">${A?'حذف گروه':'ترک گروه'}</button><div class="s" style="text-align:center;margin-top:6px">${A?'با حذف گروه، اطلاعات آن برای همه‌ی اعضا پاک می‌شود.':'فقط از لیست گروه‌های شما حذف می‌شود.'}</div><button class="sb" id="sx">انصراف</button></div>`;
   document.body.appendChild(d);try{history.pushState({sh:1},'');shPush=true}catch(e){}
   d.onclick=e=>{if(e.target===d)closeSheet()};$('sx').onclick=()=>closeSheet();
-  const pb=$('mpv');if(pb)pb.onclick=async()=>{pv=!pv;pb.textContent=pt();try{await db.doc('gx_'+cur.gid+'/priv').set({t:'priv',v:pv,at:Date.now()})}catch(e){pv=!pv;pb.textContent=pt()}};
   const cb=$('mpc');if(cb)cb.onclick=async()=>{const ok=await copyTxt(vc);cb.textContent=ok?'کپی شد ✓':'کپی ممکن نشد';setTimeout(()=>closeSheet(),700)};
   const sb=$('mps');if(sb)sb.onclick=async()=>{const txt='به گروه «'+nm+'» در دونگ بپیوندید.\nکد گروه: '+vc+'\n'+location.href.split('#')[0];
     if(navigator.share){try{await navigator.share({text:txt});closeSheet();return}catch(e){if(e&&e.name==='AbortError')return}}
     const ok=await copyTxt(txt);sb.textContent=ok?'متن دعوت کپی شد ✓':'کپی ممکن نشد';setTimeout(()=>closeSheet(),900)};
-  armed($('mpd'),()=>{closeSheet();A?removeGroup():leaveGroup()})}
+  $('mpd').onclick=()=>confirmBox(A?'حذف گروه «'+esc(nm)+'»؟':'ترک گروه «'+esc(nm)+'»؟',A?'اطلاعات گروه برای همه‌ی اعضا پاک می‌شود و برگشت ندارد.':'فقط از لیست گروه‌های شما حذف می‌شود.',A?'آره، حذف کن':'آره، ترک کن',()=>{closeSheet();A?removeGroup():leaveGroup()})}
 let busy=false;
 const setBtn=(id,on,t)=>{const b=$(id);if(b){b.disabled=on;if(t)b.textContent=t}};
 async function mkGroup(){if(busy)return;const n=$('gn').value.trim(),e=$('e1');e.style.color='';e.textContent='';if(!n)return e.textContent='نام گروه را بنویسید.';
@@ -237,7 +243,8 @@ const canWrite=()=>{if(!cur)return false;const J=P.find(x=>x._d===cur.pid)||{};r
 async function put(o){if((o.t==='exp'||o.t==='pay')&&!canWrite())throw 'nomember';o.at=Date.now();if(!o.id)o.id=rid();const path='gx_'+cur.gid+'/'+o.id,q=()=>{OBQ.push({path,gid:cur.gid,data:o});obSave();banner();renderParts()};
   try{await tmo(db.doc(path).set(o),7000)}catch(e){if(transient(e))q();else throw e}}
 const sec=(k,id,t,b,open)=>`<div class="c acc" id="${id}"><div class="ah${open?' open':''}"><span>${t}</span><span class="ar">${CH}</span></div><div class="ab" style="display:${open?'':'none'}">${b}</div></div>`;
-async function wipe(gid){const s=await db.collection('gx_'+gid).get(),cd=[];
+async function wipe(gid){if(live){try{await w({op:'wipe',gid});return}catch(e){}}
+  const s=await db.collection('gx_'+gid).get(),cd=[];
   s.docs.forEach(d=>{const x=d.data();if(x.t==='meta')cd.push(x.vc,x.ac)});
   await Promise.all([...s.docs.map(d=>db.doc('gx_'+gid+'/'+d.id).delete()),...cd.filter(Boolean).map(c=>db.doc('codes/'+c).delete())]);
   const g=await db.collection('gm_'+gid).get();await Promise.all(g.docs.map(d=>db.doc('gm_'+gid+'/'+d.id).delete()))}
@@ -246,7 +253,7 @@ async function removeGroup(g){g=g||cur;try{await wipe(g.gid);await db.doc(pcol()
 function afterGone(){if(view==='group')homeShell();else if(view==='home'){syncSubs();renderHome()}}
 
 function groupShell(){view='group';
-  $('app').innerHTML=`<div class="sh"><button class="g" id="bk">→ بازگشت</button><span class="gid" id="gid"></span><button class="g" id="mn" aria-label="منو" style="padding:8px 10px;line-height:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
+  $('app').innerHTML=`<div class="sh"><button class="g" id="bk" aria-label="بازگشت" style="padding:8px 10px;line-height:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button><span class="gid" id="gid"></span><button class="g" id="mn" aria-label="منو" style="padding:8px 10px;line-height:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
   <div class="th"><h1 id="gt"></h1><div class="mr"><span id="meh"></span><button class="mb" id="mb">👥 اعضا <span id="mc"></span><span class="ar2" id="mar">${CH}</span></button></div></div>
   <div class="c" id="mp" style="display:none"><div id="mel"><div class="lab">شما کدام عضو هستید؟</div><span id="mep"><select id="me"></select></span></div>
   <div class="chips" id="plist"></div><div class="r" id="addp"><input type="text" id="pn" placeholder="نام عضو جدید"><button id="addP">افزودن</button></div>
@@ -261,7 +268,7 @@ function groupShell(){view='group';
   <div class="lab">پرداخت‌کننده</div><select id="py"></select>
   <div class="lab">سهیم‌ها</div><div class="chips" id="pp"></div>
   <div class="seg" id="mseg"><div data-m="equal" class="on">تقسیم مساوی</div><div data-m="custom">مبلغ دلخواه</div></div>
-  <div id="shr"></div><button id="addE" style="width:100%">ثبت هزینه</button><div class="s err" id="err"></div>`);
+  <div id="shr"></div><button id="addE" style="width:100%">ثبت هزینه</button><div class="s err" id="err"></div><div class="s" id="pvn" style="display:none;margin-top:10px;padding:8px 10px;border-radius:10px;background:var(--pvb);color:var(--pv)"></div>`);
   document.querySelectorAll('.ah').forEach(h=>h.onclick=()=>{const b=h.nextElementSibling,o=b.style.display==='none';b.style.display=o?'':'none';h.classList.toggle('open',o);
     if(o){const c=h.closest('.acc'),w=document.querySelector('.w');if(w)w.style.paddingBottom=Math.max(90,Math.round(window.innerHeight-c.offsetHeight-24))+'px';requestAnimationFrame(()=>c.scrollIntoView({behavior:'smooth',block:'start'}))}});
   $('app').insertAdjacentHTML('beforeend',KP+FAB);$('kp').querySelectorAll('button').forEach(b=>{b.onmousedown=e=>e.preventDefault();b.onclick=()=>b.dataset.k==='ok'?closeKp():b.dataset.k==='b'?0:kpKey(b.dataset.k)});
@@ -308,6 +315,7 @@ function fill(){if(st.mode!=='custom'||!$('shr'))return;const m=model(),ids=sel(
   else if(st.auto){setv(st.auto,0);st.auto=null}
   remain()}
 function renderShares(){const m=model(),h=$('shr');if(!h)return;
+  {const n=$('pvn');if(n){const a=sel(m).length,t=m.people.length,on=t>1&&a>0&&a<t;n.style.display=on?'':'none';if(on)n.textContent='🔒 چون همه‌ی اعضا انتخاب نشده‌اند، این هزینه و مبلغی که به بدهی/طلب بقیه اضافه می‌کند فقط برای پرداخت‌کننده و سهیم‌ها (و ثبت‌کننده) نمایش داده می‌شود. بقیه‌ی اعضا چیزی از آن نمی‌بینند؛ پس با خیال راحت هزینه را ثبت کنید.'}}
   if(st.mode!=='custom'){h.innerHTML='';closeKp();return}
   h.innerHTML='<div class="s" style="margin-bottom:6px">روی کادر هر نفر بزنید و با صفحه‌کلید پایین صفحه محاسبه کنید.</div>'+
    sel(m).map(i=>`<div class="sh"><span style="flex:0 0 60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(m.people.find(p=>p.id===i).name)}</span><textarea class="xb" rows="1" inputmode="none" spellcheck="false" autocomplete="off" data-id="${esc(i)}" placeholder="سهم (تومان)"></textarea></div><div class="s pv" data-pv="${esc(i)}"></div>`).join('')+'<div id="rem" class="s" style="margin-bottom:8px"></div>';
@@ -395,10 +403,10 @@ function startEdit(e){const m=model();st.edit={id:e.id,_d:e._d,at:e.at,by:e.by};
   renderParts();$('sf').scrollIntoView({behavior:'smooth'})}
 
 function renderParts(){if(!$('plist'))return;banner();const m=model(),A=adm(),J=P.find(x=>x._d===cur.pid)||{};$('gt').textContent=m.name;
+  const meI=J.me&&m.people.some(p=>p.id===J.me)?J.me:null,inv=e=>!!meI&&(e.t==='pay'?(e.from===meI||e.to===meI):(e.payer===meI||meI in (e.shares||{})||e.by===meI));
+  {const t=document.querySelector('#sl .ah span');if(t)t.textContent='هزینه‌های مرتبط با شما'}
   if(J.me&&!m.claims[J.me]&&!st.cl){st.cl=1;db.doc('gx_'+cur.gid+'/claim_'+J.me).set({t:'claim',pid:J.me,by:myId,at:Date.now()}).catch(()=>{})}
-  const PV=m.priv,meI=J.me&&m.people.some(p=>p.id===J.me)?J.me:null,inv=e=>!!meI&&(e.t==='pay'?(e.from===meI||e.to===meI):(e.payer===meI||meI in (e.shares||{})||e.by===meI));
-  $('rl').textContent=(A?'👑 شما ادمین هستید':'')+(PV?(A?' · ':'')+'🔒 حالت خصوصی روشن است':'');
-  {const t=document.querySelector('#sl .ah span');if(t)t.textContent=PV?'هزینه‌های مرتبط با شما':'کل هزینه‌ها'}
+  $('rl').textContent=A?'👑 شما ادمین هستید':'';
   const canW=canWrite();document.body.classList.toggle('nw',!canW);
   $('sf').style.display=(canW||st.edit)?'':'none';
   {const px=$('payx');if(px)px.parentNode.style.display=canW?'':'none';if(!canW)$('payf').style.display='none'}
@@ -419,17 +427,17 @@ function renderParts(){if(!$('plist'))return;banner();const m=model(),A=adm(),J=
   $('pp').innerHTML=m.people.map(p=>`<span class="chip ${st.sel[p.id]!==false?'on':''}" data-id="${esc(p.id)}">${esc(p.name)}</span>`).join('');
   $('pp').querySelectorAll('.chip').forEach(c=>c.onclick=()=>{st.sel[c.dataset.id]=st.sel[c.dataset.id]===false;c.classList.toggle('on',st.sel[c.dataset.id]!==false);clrAuto();renderShares()});
   if(!document.activeElement||!document.activeElement.closest('#shr'))renderShares();
-  const bal=balances(m),nm=id=>(m.people.find(p=>p.id===id)||{name:'؟'}).name;
+  const mv={...m,exps:m.exps.filter(inv),pays:m.pays.filter(inv)},bal=balances(mv),act=new Set(meI?[meI]:[]),nm=id=>(m.people.find(p=>p.id===id)||{name:'؟'}).name;
   {const o=m.people.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join(''),f=$('pf'),t=$('pt'),a=f.value,b=t.value;f.innerHTML=o;t.innerHTML=o;if(a)f.value=a;if(b)t.value=b;else if(t.options.length>1)t.selectedIndex=1}
+  mv.exps.forEach(e=>{act.add(e.payer);Object.keys(e.shares||{}).forEach(i=>act.add(i))});mv.pays.forEach(e=>{act.add(e.from);act.add(e.to)});
   $('mine').innerHTML=J.me&&J.me in bal?'وضع شما: '+balTxt(bal[J.me]):'';
-  $('bal').innerHTML=PV?(meI?`<div class="row"><span>${esc(nm(meI))}</span>${balTxt(bal[meI])}</div>`:'<div class="s">برای دیدن وضع حساب، اول نام خودتان را از بخش «اعضا» انتخاب کنید.</div>'):m.people.length?m.people.map(p=>`<div class="row"><span>${esc(p.name)}</span>${balTxt(bal[p.id])}</div>`).join(''):'<div class="s">هنوز عضوی نیست.</div>';
+  $('bal').innerHTML=!meI&&m.people.length?'<div class="s">برای دیدن وضع حساب، اول نام خودتان را از بخش «اعضا» انتخاب کنید.</div>':m.people.length?m.people.filter(p=>act.has(p.id)).map(p=>`<div class="row"><span>${esc(p.name)}</span>${balTxt(bal[p.id])}</div>`).join(''):'<div class="s">هنوز عضوی نیست.</div>';
   const cr=[],de=[];m.people.forEach(p=>{const v=Math.round(bal[p.id]);if(v>0)cr.push({id:p.id,v});else if(v<0)de.push({id:p.id,v:-v})});
   cr.sort((a,b)=>b.v-a.v);de.sort((a,b)=>b.v-a.v);const tx=[];let i=0,j=0;
   while(i<de.length&&j<cr.length){const x=Math.min(de[i].v,cr[j].v);if(x>0)tx.push({f:de[i].id,t:cr[j].id,a:x});de[i].v-=x;cr[j].v-=x;if(!de[i].v)i++;if(!cr[j].v)j++}
-  const vtx=PV?tx.filter(t=>meI&&(t.f===meI||t.t===meI)):tx;
-  $('set').innerHTML=vtx.length?'<div class="lab" style="margin-top:12px">پیشنهاد پرداخت:</div>'+vtx.map((t,k)=>`<div class="row"><span>${esc(nm(t.f))} ← ${tm(t.a)} ← ${esc(nm(t.t))}</span>${canW?'<button class="g" data-pay="'+k+'">ثبت پرداخت</button>':''}</div>`).join(''):'';
-  $('set').querySelectorAll('button[data-pay]').forEach(b=>armed(b,async()=>{const t=vtx[b.dataset.pay];try{await put({t:'pay',id:rid(),from:t.f,to:t.t,amount:t.a,date:today()})}catch(e){}}));
-  const all0=[...m.exps,...m.pays].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.at-a.at),all=PV?all0.filter(inv):all0,rw=(k,v)=>`<div class="row"><span>${k}</span><span>${v}</span></div>`,emp=PV?(meI?'هنوز هزینه‌ای مربوط به شما ثبت نشده.':'برای دیدن هزینه‌ها، اول نام خودتان را از بخش «اعضا» انتخاب کنید.'):'هنوز هزینه‌ای ثبت نشده.';
+  $('set').innerHTML=tx.length?'<div class="lab" style="margin-top:12px">پیشنهاد پرداخت:</div>'+tx.map((t,k)=>`<div class="row"><span>${esc(nm(t.f))} ← ${tm(t.a)} ← ${esc(nm(t.t))}</span>${canW?'<button class="g" data-pay="'+k+'">ثبت پرداخت</button>':''}</div>`).join(''):'';
+  $('set').querySelectorAll('button[data-pay]').forEach(b=>armed(b,async()=>{const t=tx[b.dataset.pay];try{await put({t:'pay',id:rid(),from:t.f,to:t.t,amount:t.a,date:today()})}catch(e){}}));
+  const all=[...mv.exps,...mv.pays].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.at-a.at),rw=(k,v)=>`<div class="row"><span>${k}</span><span>${v}</span></div>`,emp=meI?'هنوز هزینه‌ای مربوط به شما ثبت نشده.':'برای دیدن هزینه‌ها، اول نام خودتان را از بخش «اعضا» انتخاب کنید.';
   $('list').innerHTML=all.length?all.map(e=>{const o=st.open===e.id,pay=e.t==='pay';
     const head=pay?`<div><b>💸 پرداخت</b><div class="s">${fd(e.date||'')} · ${esc(nm(e.from))} به ${esc(nm(e.to))}</div></div>`:`<div><b>${esc(e.title)}</b>${e.custom?'<span class="b pr">نامساوی</span>':''}<div class="s">${fd(e.date||'')} · ${esc(nm(e.payer))} پرداخت کرد</div>${e.by?`<div class="s">ثبت‌کننده: ${esc(nm(e.by))}</div>`:''}</div>`;
     let det='';
