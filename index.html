@@ -42,11 +42,11 @@ button.g{background:transparent;color:var(--mut);padding:4px 8px;font-weight:400
 #shs .sb.dn{color:var(--no)}
 #cfb{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:70;display:flex;align-items:center;justify-content:center;padding:20px}
 #cfd{width:100%;max-width:340px;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.35)}
-#cfd .ct{font-weight:800;font-size:17px;margin-bottom:8px}
-#cfd .cr{display:flex;gap:10px;margin-top:16px}
-#cfd .cr button{flex:1}
-#cfd .cy{background:var(--no);color:#fff}
-#cfd .cn{background:var(--bg);color:var(--tx);border:1px solid var(--bd)}
+#cfd .cfT{font-weight:800;font-size:17px;margin-bottom:8px}
+#cfd .cfR{display:flex;gap:10px;margin-top:16px}
+#cfd .cfR button{flex:1}
+#cfd .cfYes{background:#dc2626;color:#fff}
+#cfd .cfNo{background:var(--bg);color:var(--tx);border:1px solid var(--bd)}
 .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--bd);gap:8px}
 .row:first-of-type{border-top:0}
 .b{font-size:11px;border-radius:8px;padding:1px 8px;margin-inline-start:6px}
@@ -186,7 +186,7 @@ function renderHome(){const L=$('gl');if(!L)return;const gs=joinedList();
   if(gs.length)L.insertAdjacentHTML('beforeend','<div class="s" style="text-align:center;margin-top:8px">برای گزینه‌های بیشتر (حذف و…)، روی گروه نگه دارید</div>')}
 let lpDone=false,shPush=false;
 function confirmBox(title,msg,yes,fn){const o=$('cfb');if(o)o.remove();const d=document.createElement('div');d.id='cfb';
-  d.innerHTML=`<div id="cfd"><div class="ct">${title}</div><div class="s">${msg}</div><div class="cr"><button class="cy" id="cfy">${yes}</button><button class="cn" id="cfn">بیخیال</button></div></div>`;
+  d.innerHTML=`<div id="cfd"><div class="cfT">${title}</div><div class="s">${msg}</div><div class="cfR"><button class="cfYes" id="cfy">${yes}</button><button class="cfNo" id="cfn">بیخیال</button></div></div>`;
   document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.remove()};$('cfn').onclick=()=>d.remove();$('cfy').onclick=()=>{d.remove();fn()}}
 function closeSheet(pop){const c=$('cfb');if(c)c.remove();const b=$('shb');if(b)b.remove();if(shPush){shPush=false;if(!pop){skipN++;try{history.back()}catch(e){skipN--}}}}
 function openSheet(g){closeSheet();const A=g.role==='admin',h=HS[g.gid],m=h&&h.es?build(h.es):null,vc=m&&m.vc;
