@@ -72,6 +72,7 @@ body.nw #fab{display:none!important}
 .tabs button.on{background:var(--ac);color:var(--acx)}
 #sf{display:none}body.fp #sf{display:block}body.fp #gmain{display:none}body.fp #fab{display:none!important}
 #fab{inset-inline-end:auto;left:50%;transform:translateX(-50%);width:auto;height:auto;padding:14px 26px;border-radius:999px;gap:8px;font-size:16px;font-weight:800;white-space:nowrap}
+#gh{position:relative;justify-content:space-between;min-height:40px}#gh .gid{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);flex:none;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -189,7 +190,7 @@ function confirmBox(title,msg,yes,fn){const o=$('cfb');if(o)o.remove();const d=d
 function closeSheet(pop){const c=$('cfb');if(c)c.remove();const b=$('shb');if(b)b.remove();if(shPush){shPush=false;if(!pop){skipN++;try{history.back()}catch(e){skipN--}}}}
 function openSheet(g){closeSheet();const A=g.role==='admin',h=HS[g.gid],m=h&&h.es?build(h.es):null,vc=m&&m.vc;
   const d=document.createElement('div');d.id='shb';
-  d.innerHTML=`<div id="shs"><div class="shn">${esc(g.name)}</div><button class="sb" id="so">باز کردن گروه</button>${vc?`<button class="sb" id="sc">کپی شناسه گروه (<bdi dir="ltr">${esc(vc)}</bdi>)</button>`:''}<button class="sb dn" id="sd">${A?'حذف گروه':'ترک گروه'}</button><div class="s" style="text-align:center;margin-top:6px">${A?'با حذف گروه، اطلاعات آن برای همه‌ی اعضا پاک می‌شود.':'فقط از لیست گروه‌های شما حذف می‌شود.'}</div><button class="sb" id="sx">انصراف</button></div>`;
+  d.innerHTML=`<div id="shs"><div class="shn">${esc(g.name)}</div><button class="sb" id="so">باز کردن گروه</button>${vc?`<button class="sb" id="sc">کپی شناسه گروه (<bdi dir="ltr">${esc(vc)}</bdi>)</button>`:''}${vc?`<button class="sb" id="si">ارسال دعوت به گروه</button>`:''}<button class="sb dn" id="sd">${A?'حذف گروه':'ترک گروه'}</button><div class="s" style="text-align:center;margin-top:6px">${A?'با حذف گروه، اطلاعات آن برای همه‌ی اعضا پاک می‌شود.':'فقط از لیست گروه‌های شما حذف می‌شود.'}</div><button class="sb" id="sx">انصراف</button></div>`;
   document.body.appendChild(d);
   try{history.pushState({sh:1},'');shPush=true}catch(e){}
   d.onclick=e=>{if(e.target===d)closeSheet()};
@@ -197,16 +198,19 @@ function openSheet(g){closeSheet();const A=g.role==='admin',h=HS[g.gid],m=h&&h.e
   $('so').onclick=()=>{const had=shPush;shPush=false;d.remove();if(had)gPush=true;openGroup(g)};
   const sc=$('sc');if(sc)sc.onclick=async()=>{let ok=false;try{await navigator.clipboard.writeText(vc);ok=true}catch(e){try{const ta=document.createElement('textarea');ta.value=vc;document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');ta.remove()}catch(_){}}
     sc.textContent=ok?'کپی شد ✓':'کپی ممکن نشد';setTimeout(()=>closeSheet(),700)};
+  const si=$('si');if(si)si.onclick=async()=>{const txt='به گروه «'+((m&&m.name)||g.name)+'» در دونگ بپیوندید.\nکد گروه: '+vc+'\n'+location.href.split('#')[0];
+    if(navigator.share){try{await navigator.share({text:txt});closeSheet();return}catch(e){if(e&&e.name==='AbortError')return}}
+    const ok=await copyTxt(txt);si.textContent=ok?'متن دعوت کپی شد ✓':'کپی ممکن نشد';setTimeout(()=>closeSheet(),900)};
   $('sd').onclick=()=>confirmBox(A?'حذف گروه «'+esc(g.name)+'»؟':'ترک گروه «'+esc(g.name)+'»؟',A?'اطلاعات گروه برای همه‌ی اعضا پاک می‌شود و برگشت ندارد.':'فقط از لیست گروه‌های شما حذف می‌شود.',A?'آره، حذف کن':'آره، ترک کن',()=>{closeSheet();A?removeGroup(g):leaveGroup(g)})}
 async function copyTxt(v){try{await navigator.clipboard.writeText(v);return true}catch(e){try{const t=document.createElement('textarea');t.value=v;document.body.appendChild(t);t.select();const ok=document.execCommand('copy');t.remove();return ok}catch(_){return false}}}
 function openMenu(){closeSheet();const A=adm(),m=model(),vc=m.vc,nm=m.name||cur.name;
   const d=document.createElement('div');d.id='shb';
   d.innerHTML=`<div id="shs"><div class="shn">${esc(nm)}</div>`+
     (vc?`<button class="sb" id="mpc">کپی شناسه گروه (<bdi dir="ltr">${esc(vc)}</bdi>)</button><button class="sb" id="mps">ارسال دعوت به گروه</button>`:'')+
-    `<button class="sb dn" id="mpd">${A?'حذف گروه':'ترک گروه'}</button><div class="s" style="text-align:center;margin-top:6px">${A?'با حذف گروه، اطلاعات آن برای همه‌ی اعضا پاک می‌شود.':'فقط از لیست گروه‌های شما حذف می‌شود.'}</div><button class="sb" id="sx">انصراف</button></div>`;
+    `<button class="sb" id="mpi">📷 خروجی تصویر</button><button class="sb dn" id="mpd">${A?'حذف گروه':'ترک گروه'}</button><div class="s" style="text-align:center;margin-top:6px">${A?'با حذف گروه، اطلاعات آن برای همه‌ی اعضا پاک می‌شود.':'فقط از لیست گروه‌های شما حذف می‌شود.'}</div><button class="sb" id="sx">انصراف</button></div>`;
   document.body.appendChild(d);try{history.pushState({sh:1},'');shPush=true}catch(e){}
   d.onclick=e=>{if(e.target===d)closeSheet()};$('sx').onclick=()=>closeSheet();
-  const cb=$('mpc');if(cb)cb.onclick=async()=>{const ok=await copyTxt(vc);cb.textContent=ok?'کپی شد ✓':'کپی ممکن نشد';setTimeout(()=>closeSheet(),700)};
+  $('mpi').onclick=exportPick;const cb=$('mpc');if(cb)cb.onclick=async()=>{const ok=await copyTxt(vc);cb.textContent=ok?'کپی شد ✓':'کپی ممکن نشد';setTimeout(()=>closeSheet(),700)};
   const sb=$('mps');if(sb)sb.onclick=async()=>{const txt='به گروه «'+nm+'» در دونگ بپیوندید.\nکد گروه: '+vc+'\n'+location.href.split('#')[0];
     if(navigator.share){try{await navigator.share({text:txt});closeSheet();return}catch(e){if(e&&e.name==='AbortError')return}}
     const ok=await copyTxt(txt);sb.textContent=ok?'متن دعوت کپی شد ✓':'کپی ممکن نشد';setTimeout(()=>closeSheet(),900)};
@@ -251,14 +255,14 @@ async function removeGroup(g){g=g||cur;try{await wipe(g.gid);await db.doc(pcol()
 function afterGone(){if(view==='group')homeShell();else if(view==='home'){syncSubs();renderHome()}}
 
 function groupShell(){view='group';
-  $('app').innerHTML=`<div id="gmain"><div class="sh"><button class="g" id="bk" aria-label="بازگشت" style="padding:8px 10px;line-height:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button><span class="gid" id="gid"></span><button class="g" id="mn" aria-label="منو" style="padding:8px 10px;line-height:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
+  $('app').innerHTML=`<div id="gmain"><div class="sh" id="gh"><button class="g" id="bk" aria-label="بازگشت" style="padding:8px 10px;line-height:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button><span class="gid" id="gid"></span><button class="g" id="mn" aria-label="منو" style="padding:8px 10px;line-height:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
   <div class="th"><h1 id="gt"></h1><div class="mr"><span id="meh"></span><button class="mb" id="mb">👥 اعضا <span id="mc"></span><span class="ar2" id="mar">${CH}</span></button></div></div>
   <div class="c" id="mp" style="display:none"><div id="mel"><div class="lab">شما کدام عضو هستید؟</div><span id="mep"><select id="me"></select></span></div>
   <div class="chips" id="plist"></div><div class="r" id="addp"><input type="text" id="pn" placeholder="نام عضو جدید"><button id="addP">افزودن</button></div>
   <button id="lockb" style="width:100%;margin-top:4px">✓ تایید نهایی اعضا</button><button class="g" id="unlk" style="display:none">باز کردن قفل اعضا</button></div>
   <div class="sub" id="rl"></div><div class="s" id="vn" style="display:none;margin:-6px 0 12px;padding:8px 10px;border-radius:10px;background:var(--pvb);color:var(--pv)"></div><div id="mine" style="margin:-8px 0 14px"></div><div id="obn" class="s" style="display:none;text-align:center;margin:-6px 0 12px;color:var(--pv)"></div>`+
   `<div class="tabs"><button id="tbS" class="on">تسویه حساب</button><button id="tbL">هزینه‌ها</button></div><div class="c" id="pS"><div id="bal"></div><div id="set"></div><div style="text-align:center;margin-top:6px"><button class="g" id="payx">+ ثبت پرداخت دلخواه</button></div>
-  <div id="payf" style="display:none"><div class="lab">چه کسی پرداخت کرد</div><select id="pf"></select><div class="lab">به چه کسی</div><select id="pt"></select><input type="text" id="pa" inputmode="numeric" placeholder="مبلغ (تومان)"><button id="pgo" style="width:100%">ثبت پرداخت</button><div class="s err" id="perr"></div></div></div>`+
+  <div id="payf" style="display:none"><div class="lab">چه کسی پرداخت کرد</div><select id="pf"></select><div class="lab">به چه کسی</div><select id="pt"></select><input type="text" id="pa" inputmode="numeric" placeholder="مبلغ (تومان)"><button id="pgo" style="width:100%">ثبت پرداخت</button><div class="s err" id="perr"></div></div><button id="exb" style="width:100%;margin-top:14px;background:var(--tint);color:var(--ac2);border:1px solid var(--bd)">📷 خروجی تصویر برای اشتراک‌گذاری</button></div>`+
   '<div class="c" id="pL" style="display:none"><div id="mlist"></div></div></div>'+
   `<div id="sf"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><button class="g" id="fbk" aria-label="بازگشت" style="padding:8px 10px;line-height:0;flex:0 0 auto"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button><h2 style="flex:1;margin:0"><span class="plc">${PL}</span>ثبت هزینه جدید</h2><span style="flex:0 0 40px"></span></div><div class="c"><div id="editb" class="s" style="display:none;color:var(--pv);margin-bottom:8px">✏️ در حال ویرایش هزینه — <button class="g" id="cancelE">انصراف</button></div><input type="text" id="tt" placeholder="بابت (مثلاً شام)">
   <div class="r"><input type="text" id="am" inputmode="numeric" placeholder="مبلغ (تومان)"><input type="text" id="dt" dir="ltr" value="${fd(today())}"></div>
@@ -271,7 +275,7 @@ function groupShell(){view='group';
   {const bb=$('kp').querySelector('[data-k="b"]');let ht=null,hi=null;const sp=()=>{clearTimeout(ht);clearInterval(hi);ht=hi=null};
    bb.onpointerdown=e=>{e.preventDefault();sp();kpKey('b');ht=setTimeout(()=>{hi=setInterval(()=>kpKey('b'),70)},380)};
    ['onpointerup','onpointercancel','onpointerleave'].forEach(ev=>bb[ev]=sp);bb.oncontextmenu=e=>e.preventDefault();bb.style.touchAction='manipulation';bb.style.userSelect='none';bb.style.webkitUserSelect='none'}
-  $('fab').onclick=openForm;$('fbk').onclick=()=>{closeKp();leaveForm();fUnpush()};
+  $('fab').onclick=openForm;$('exb').onclick=exportPick;$('fbk').onclick=()=>{closeKp();leaveForm();fUnpush()};
   $('bk').onclick=homeShell;$('mn').onclick=openMenu;
   $('gid').onclick=()=>{const v=$('gid').dataset.c;if(!v)return;try{navigator.clipboard.writeText(v)}catch(e){try{const t=document.createElement('textarea');t.value=v;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}catch(x){}}
     const h=$('gid').innerHTML;$('gid').textContent='کپی شد ✓';setTimeout(()=>{$('gid').innerHTML=h},1200)};
@@ -399,6 +403,71 @@ function startEdit(e){const m=model();st.edit={id:e.id,_d:e._d,at:e.at,by:e.by};
   document.querySelectorAll('#mseg div').forEach(x=>x.classList.toggle('on',x.dataset.m===st.mode));
   $('addE').textContent='ذخیره تغییرات';$('editb').style.display='';
   renderParts();openForm()}
+
+// ----- image export (canvas -> PNG, shareable) -----
+function toast(t){const o=$('tst');if(o)o.remove();const d=document.createElement('div');d.id='tst';d.textContent=t;d.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:96px;max-width:86%;background:#1b1f27;color:#fff;padding:10px 16px;border-radius:12px;z-index:90;font-size:14px;text-align:center';document.body.appendChild(d);setTimeout(()=>d.remove(),2800)}
+function exportData(sel){const m=model(),J=P.find(x=>x._d===cur.pid)||{},me=J.me&&m.people.some(p=>p.id===J.me)?J.me:null;if(!me)return null;
+  const inv=e=>e.t==='pay'?(e.from===me||e.to===me||e.by===me):(e.payer===me||me in (e.shares||{})||e.by===me);
+  const cmp=(a,b)=>(a.date||'').localeCompare(b.date||'')||a.at-b.at,vis=m.exps.filter(inv).sort(cmp),part=!!sel&&sel.size<vis.length;
+  const exps=vis.filter(e=>!sel||sel.has(e.id)),pays=part?[]:m.pays.filter(inv).sort(cmp);
+  const bal=balances({...m,exps,pays}),nm=id=>(m.people.find(p=>p.id===id)||{name:'؟'}).name,act=new Set();
+  exps.forEach(e=>{act.add(e.payer);Object.keys(e.shares||{}).forEach(i=>act.add(i))});pays.forEach(e=>{act.add(e.from);act.add(e.to)});
+  const rows=m.people.filter(p=>act.has(p.id)).map(p=>({name:p.name,paid:exps.reduce((a,e)=>a+(e.payer===p.id?e.amount:0),0),share:exps.reduce((a,e)=>a+((e.shares||{})[p.id]||0),0),bal:bal[p.id]}));
+  const cr=[],de=[],tx=[];m.people.forEach(p=>{const v=Math.round(bal[p.id]);if(v>0)cr.push({id:p.id,v});else if(v<0)de.push({id:p.id,v:-v})});
+  cr.sort((a,b)=>b.v-a.v);de.sort((a,b)=>b.v-a.v);let i=0,j=0;
+  while(i<de.length&&j<cr.length){const x=Math.min(de[i].v,cr[j].v);if(x>0)tx.push({f:de[i].id,t:cr[j].id,a:x});de[i].v-=x;cr[j].v-=x;if(!de[i].v)i++;if(!cr[j].v)j++}
+  return {name:m.name||cur.name,all:vis,exps,pays,rows,tx,nm,part,total:exps.reduce((a,e)=>a+e.amount,0),hidden:m.exps.length-vis.length}}
+function drawImg(ctx,D,dry){const W=1080,L=48,R=W-48,FN='Vazirmatn,Tahoma,sans-serif',f=(s,w)=>(w||400)+' '+s+'px '+FN,Gy='#6b7380',Tx='#1b1f27';let y=0;
+  ctx.direction='rtl';ctx.textBaseline='alphabetic';
+  const T=(t,x,yy,font,col,al)=>{if(dry)return;ctx.font=font;ctx.fillStyle=col;ctx.textAlign=al||'right';ctx.fillText(t,x,yy)};
+  const RC=(x,yy,w,h,r,fill)=>{if(dry)return;ctx.fillStyle=fill;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x,yy,w,h,r);else ctx.rect(x,yy,w,h);ctx.fill()};
+  const LN=yy=>{if(dry)return;ctx.fillStyle='#eceff3';ctx.fillRect(L,yy,R-L,2)};
+  const wrap=(t,font,mw)=>{ctx.font=font;const o=[];let c='';t.split(' ').forEach(w=>{const x=c?c+' '+w:w;if(c&&ctx.measureText(x).width>mw){o.push(c);c=w}else c=x});if(c)o.push(c);return o};
+  const cut=(t,font,mw)=>{ctx.font=font;while(t.length>1&&ctx.measureText(t).width>mw)t=t.slice(0,-2)+'…';return t};
+  if(!dry){ctx.fillStyle='#ffffff';ctx.fillRect(0,0,W,ctx.canvas.height);const g=ctx.createLinearGradient(W,0,0,180);g.addColorStop(0,'#2f6df6');g.addColorStop(1,'#7c3aed');ctx.fillStyle=g;ctx.fillRect(0,0,W,180)}
+  T(cut('🧾 '+D.name,f(54,800),W-2*L-230),R,84,f(54,800),'#fff');
+  T(fd(today()),L,84,f(28),'rgba(255,255,255,.88)','left');
+  T('جمع هزینه\u200cها: '+tm(D.total)+'  •  '+fa(D.rows.length)+' نفر',R,140,f(30,600),'rgba(255,255,255,.95)');
+  y=180;
+  const sec=t=>{y+=34;RC(L,y,R-L,58,14,'#eef0ff');T(t,R-22,y+41,f(32,800),'#4338ca');y+=58+16};
+  if(D.exps.length){sec('هزینه\u200cها');D.exps.forEach(e=>{const ids=Object.keys(e.shares||{}),n=ids.length||1;
+    T(cut(e.title,f(32,600),R-L-330),R,y+40,f(32,600),Tx);T(tm(e.amount),L,y+40,f(32,800),Tx,'left');y+=40;
+    T(D.nm(e.payer)+' پرداخت کرد  •  '+fd(e.date||''),R,y+36,f(26),Gy);y+=36;
+    const txt=e.custom?ids.map(i=>D.nm(i)+' '+fa(e.shares[i])).join('  •  '):ids.map(i=>D.nm(i)).join('، ')+' — هر نفر '+fa(Math.floor(e.amount/n));
+    wrap('سهیم\u200cها: '+txt,f(26),R-L).forEach(l=>{T(l,R,y+36,f(26),Gy);y+=36});y+=14;LN(y);y+=10})}
+  if(D.pays.length){sec('پرداخت\u200cهای ثبت\u200cشده');D.pays.forEach(p=>{T(D.nm(p.from)+' ← '+D.nm(p.to),R,y+40,f(30,600),Tx);T(tm(p.amount),L,y+40,f(30,800),'#16a34a','left');y+=40;T(fd(p.date||''),R,y+34,f(24),Gy);y+=34+14;LN(y);y+=10})}
+  sec('سهم هر عضو');D.rows.forEach(r=>{const b=r.bal,z=Math.abs(b)<.5;
+    T(r.name,R,y+40,f(32,600),Tx);T(z?'تسویه\u200cشده ✓':(b>0?'بستانکار ':'بدهکار ')+tm(Math.abs(b)),L,y+40,f(30,800),z?Gy:b>0?'#16a34a':'#dc2626','left');y+=40;
+    T('پرداخت: '+tm(r.paid)+'  •  سهم: '+tm(r.share),R,y+36,f(26),Gy);y+=36+14;LN(y);y+=10});
+  sec('تسویه حساب');
+  if(D.tx.length)D.tx.forEach(t=>{T(D.nm(t.f)+'  ←  '+tm(t.a)+'  ←  '+D.nm(t.t),W/2,y+42,f(32,600),Tx,'center');y+=60});
+  else{T('همه حساب\u200cها صاف است ✓',W/2,y+42,f(32,600),'#16a34a','center');y+=60}
+  {const nt=[];if(D.part)nt.push('محاسبات فقط بر اساس هزینه\u200cهای انتخاب\u200cشده است.');if(D.hidden>0)nt.push('این تصویر فقط هزینه\u200cهایی را نشان می\u200cدهد که شما در آن\u200cها نقش داشته\u200cاید.');if(nt.length){y+=14;wrap('توجه: '+nt.join(' '),f(24),R-L).forEach(l=>{T(l,R,y+34,f(24),Gy);y+=32})}}
+  y+=24;T('ساخته\u200cشده با دونگ',W/2,y+30,f(24),'#9aa3b0','center');return y+64}
+function exportPick(){if(!$('shs')){const o=document.createElement('div');o.id='shb';o.innerHTML='<div id="shs"></div>';document.body.appendChild(o);try{history.pushState({sh:1},'');shPush=true}catch(e){}o.onclick=e=>{if(e.target===o)closeSheet()}}
+  const D=exportData(null),s=$('shs');s.style.maxHeight='94vh';s.style.overflow='auto';
+  if(!D){closeSheet();return toast('برای گرفتن خروجی، اول نام خودتان را در «اعضا» انتخاب کنید.')}
+  if(!D.all.length){closeSheet();return toast('هنوز هزینه\u200cای برای خروجی گرفتن نیست.')}
+  const on=new Set();
+  s.innerHTML=`<div class="shn">کدام هزینه\u200cها در تصویر باشند؟</div><div class="s" style="text-align:center;margin-bottom:6px">سهم اعضا و تسویه هم فقط از روی هزینه\u200cهای انتخاب\u200cشده حساب می\u200cشود.</div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><button class="g" id="pkA">انتخاب همه</button><button class="g" id="pkN">هیچ\u200cکدام</button></div><div id="pkL" style="max-height:40vh;overflow:auto;border:1px solid var(--bd);border-radius:10px;padding:0 10px">`+
+    D.all.map(e=>`<label class="row" style="cursor:pointer"><span style="display:flex;align-items:center;gap:10px;min-width:0"><input type="checkbox" data-id="${esc(e.id)}" style="width:20px;height:20px;margin:0;flex:0 0 auto"><span style="min-width:0"><b>${esc(e.title)}</b><div class="s">${fd(e.date||'')} · ${esc(D.nm(e.payer))}</div></span></span><b style="white-space:nowrap">${tm(e.amount)}</b></label>`).join('')+
+    `</div><button class="sb" id="pkGo" style="background:var(--ac);color:var(--acx);border:0"></button><button class="sb" id="sx">انصراف</button>`;
+  const go=$('pkGo'),upd=()=>{const n=on.size;go.disabled=!n;go.style.opacity=n?'':'.5';go.textContent=n?'ساخت تصویر ('+fa(n)+' هزینه)':'حداقل یک هزینه را انتخاب کنید'};upd();
+  const boxes=[...s.querySelectorAll('#pkL input')];
+  boxes.forEach(b=>b.onchange=()=>{b.checked?on.add(b.dataset.id):on.delete(b.dataset.id);upd()});
+  $('pkA').onclick=()=>{boxes.forEach(b=>{b.checked=true;on.add(b.dataset.id)});upd()};
+  $('pkN').onclick=()=>{boxes.forEach(b=>b.checked=false);on.clear();upd()};
+  $('sx').onclick=()=>closeSheet();go.onclick=()=>{if(on.size)exportBuild(new Set(on))}}
+async function exportBuild(sel){const D=exportData(sel);if(!D)return;toast('در حال ساخت تصویر…');
+  try{await Promise.all([400,600,800].map(w=>document.fonts.load(w+' 28px Vazirmatn','آابپتثجچحخدذرزسشصضطظعغفقکگلمنوهی۰۱۲۳۴۵۶۷۸۹')))}catch(e){}
+  const cv=document.createElement('canvas');cv.width=1080;cv.height=400;let ctx=cv.getContext('2d');
+  const H=drawImg(ctx,D,true);cv.height=Math.ceil(H);ctx=cv.getContext('2d');drawImg(ctx,D,false);
+  const blob=await new Promise(r=>cv.toBlob(r,'image/png'));if(!blob)return toast('ساخت تصویر ممکن نشد.');showImg(blob,D.name)}
+function showImg(blob,name){const s=$('shs');if(!s)return;const url=URL.createObjectURL(blob),file=new File([blob],'dong-'+Date.now()+'.png',{type:'image/png'});
+  s.innerHTML=`<div class="shn">تصویر خروجی</div><img src="${url}" alt="" style="display:block;width:100%;max-height:50vh;object-fit:contain;border-radius:10px;border:1px solid var(--bd);background:#fff"><button class="sb" id="imS" style="background:var(--ac);color:var(--acx);border:0">اشتراک\u200cگذاری</button><button class="sb" id="imD">ذخیره در گوشی</button><button class="sb" id="sx">بستن</button>`;
+  const save=()=>{const a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove()};
+  $('sx').onclick=()=>{closeSheet();setTimeout(()=>URL.revokeObjectURL(url),600)};$('imD').onclick=save;
+  $('imS').onclick=async()=>{try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}}catch(e){if(e&&e.name==='AbortError')return}save()}}
 
 function renderParts(){if(!$('plist'))return;banner();const m=model(),A=adm(),J=P.find(x=>x._d===cur.pid)||{};$('gt').textContent=m.name;
   const meI=J.me&&m.people.some(p=>p.id===J.me)?J.me:null,inv=e=>!!meI&&(e.t==='pay'?(e.from===meI||e.to===meI||e.by===meI):(e.payer===meI||meI in (e.shares||{})||e.by===meI));
