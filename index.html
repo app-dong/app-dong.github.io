@@ -147,7 +147,7 @@ document.addEventListener('focusin',e=>{if(st.focus&&!e.target.closest('#shr')&&
   homeShell();flush();
   pc().onSnapshot(s=>{P=s.docs.map(d=>({...d.data(),_d:d.id}));if(view==='home'){syncSubs();renderHome()}else if(cur&&P.some(x=>x._d===cur.pid))renderParts()},()=>{});
 })();
-function armed(b,fn){let t;b.onclick=()=>{if(b.dataset.a){clearTimeout(t);fn();return}b.dataset.a=1;const o=b.textContent;b.textContent='مطمئنی؟';t=setTimeout(()=>{delete b.dataset.a;b.textContent=o},3000)}}
+function armed(b,fn,title,msg,yes,ok){b.onclick=()=>{const g=v=>typeof v==='function'?v():v;confirmBox(g(title)||'مطمئنی؟',g(msg)||'',yes||'آره',fn,ok)}}
 const joinedList=()=>{const d=new Set(P.filter(e=>e.t==='del').map(e=>e.ref));return P.filter(e=>e.t==='joined'&&e.v===2&&!d.has(e.id)).sort((a,b)=>b.at-a.at)};
 const rc=()=>String(1000+Math.floor(Math.random()*9000));
 async function freeCode(){for(let k=0;k<40;k++){const c=rc();if(!(await db.doc('codes/'+c).get()).exists)return c}throw 0}
@@ -184,9 +184,9 @@ function renderHome(){const L=$('gl');if(!L)return;const gs=joinedList();
     r.onpointerup=r.onpointercancel=r.onpointerleave=cl});
   if(gs.length)L.insertAdjacentHTML('beforeend','<div class="s" style="text-align:center;margin-top:8px">برای گزینه‌های بیشتر (حذف و…)، روی گروه نگه دارید</div>')}
 let lpDone=false,shPush=false;
-function confirmBox(title,msg,yes,fn){const o=$('cfb');if(o)o.remove();const d=document.createElement('div');d.id='cfb';
+function confirmBox(title,msg,yes,fn,ok){const o=$('cfb');if(o)o.remove();const d=document.createElement('div');d.id='cfb';
   d.innerHTML=`<div id="cfd"><div class="cfT">${title}</div><div class="s">${msg}</div><div class="cfR"><button class="cfYes" id="cfy">${yes}</button><button class="cfNo" id="cfn">بیخیال</button></div></div>`;
-  document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.remove()};$('cfn').onclick=()=>d.remove();$('cfy').onclick=()=>{d.remove();fn()}}
+  document.body.appendChild(d);if(ok)$('cfy').style.cssText='background:var(--ac);color:var(--acx)';d.onclick=e=>{if(e.target===d)d.remove()};$('cfn').onclick=()=>d.remove();$('cfy').onclick=()=>{d.remove();fn()}}
 function closeSheet(pop){const c=$('cfb');if(c)c.remove();const b=$('shb');if(b)b.remove();if(shPush){shPush=false;if(!pop){skipN++;try{history.back()}catch(e){skipN--}}}}
 function openSheet(g){closeSheet();const A=g.role==='admin',h=HS[g.gid],m=h&&h.es?build(h.es):null,vc=m&&m.vc;
   const d=document.createElement('div');d.id='shb';
@@ -408,7 +408,7 @@ function startEdit(e){const m=model();st.edit={id:e.id,_d:e._d,at:e.at,by:e.by};
 function toast(t){const o=$('tst');if(o)o.remove();const d=document.createElement('div');d.id='tst';d.textContent=t;d.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:96px;max-width:86%;background:#1b1f27;color:#fff;padding:10px 16px;border-radius:12px;z-index:90;font-size:14px;text-align:center';document.body.appendChild(d);setTimeout(()=>d.remove(),2800)}
 function exportData(sel){const m=model(),J=P.find(x=>x._d===cur.pid)||{},me=J.me&&m.people.some(p=>p.id===J.me)?J.me:null;if(!me)return null;
   const inv=e=>e.t==='pay'?(e.from===me||e.to===me||e.by===me):(e.payer===me||me in (e.shares||{})||e.by===me);
-  const cmp=(a,b)=>(a.date||'').localeCompare(b.date||'')||a.at-b.at,vis=m.exps.filter(inv).sort(cmp),part=!!sel&&sel.size<vis.length;
+  const cmp=(a,b)=>(b.date||'').localeCompare(a.date||'')||b.at-a.at,vis=m.exps.filter(inv).sort(cmp),part=!!sel&&sel.size<vis.length;
   const exps=vis.filter(e=>!sel||sel.has(e.id)),pays=part?[]:m.pays.filter(inv).sort(cmp);
   const bal=balances({...m,exps,pays}),nm=id=>(m.people.find(p=>p.id===id)||{name:'؟'}).name,act=new Set();
   exps.forEach(e=>{act.add(e.payer);Object.keys(e.shares||{}).forEach(i=>act.add(i))});pays.forEach(e=>{act.add(e.from);act.add(e.to)});
@@ -503,7 +503,7 @@ function renderParts(){if(!$('plist'))return;banner();const m=model(),A=adm(),J=
   cr.sort((a,b)=>b.v-a.v);de.sort((a,b)=>b.v-a.v);const tx=[];let i=0,j=0;
   while(i<de.length&&j<cr.length){const x=Math.min(de[i].v,cr[j].v);if(x>0)tx.push({f:de[i].id,t:cr[j].id,a:x});de[i].v-=x;cr[j].v-=x;if(!de[i].v)i++;if(!cr[j].v)j++}
   $('set').innerHTML=tx.length?'<div class="lab" style="margin-top:12px">پیشنهاد پرداخت:</div>'+tx.map((t,k)=>`<div class="row"><span>${esc(nm(t.f))} ← ${tm(t.a)} ← ${esc(nm(t.t))}</span>${canW?'<button class="g" data-pay="'+k+'">ثبت پرداخت</button>':''}</div>`).join(''):'';
-  $('set').querySelectorAll('button[data-pay]').forEach(b=>armed(b,async()=>{const t=tx[b.dataset.pay];try{await put({t:'pay',id:rid(),from:t.f,to:t.t,amount:t.a,date:today()})}catch(e){}}));
+  $('set').querySelectorAll('button[data-pay]').forEach(b=>armed(b,async()=>{const t=tx[b.dataset.pay];try{await put({t:'pay',id:rid(),from:t.f,to:t.t,amount:t.a,date:today()})}catch(e){}},'ثبت این پرداخت؟',()=>{const t=tx[b.dataset.pay];return t?esc(nm(t.f))+' به '+esc(nm(t.t))+' مبلغ '+tm(t.a)+' پرداخت کرده است.':''},'آره، ثبت کن',1));
   const all=[...mv.exps,...mv.pays].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.at-a.at),rw=(k,v)=>`<div class="row"><span>${k}</span><span>${v}</span></div>`,emp=meI?'هنوز هزینه‌ای مربوط به شما ثبت نشده.':'برای دیدن هزینه‌ها، اول نام خودتان را از بخش «اعضا» انتخاب کنید.';
   renderMine(m,J,bal,nm,all,rw)}
 function renderMine(m,J,bal,nm,all,rw){const L=$('mlist');if(!L)return;
@@ -518,12 +518,12 @@ function renderMine(m,J,bal,nm,all,rw){const L=$('mlist');if(!L)return;
       right=`<div class="${out?'pos':'neg'}" style="white-space:nowrap">${out?'+':'−'} ${tm(e.amount)}</div>`;
       if(o)det='<div class="det">'+rw('تاریخ',fd(e.date||''))+rw('پرداخت‌کننده',esc(nm(e.from)))+rw('گیرنده',esc(nm(e.to)))+rw('مبلغ',tm(e.amount))+ab+'</div>'}
     else{const my1=(e.shares||{})[me]||0,net=(e.payer===me?e.amount:0)-my1;
-      head=`<div><b>${esc(e.title)}</b>${e.custom?'<span class="b pr">نامساوی</span>':''}<div class="s">${fd(e.date||'')} · ${e.payer===me?'شما پرداخت کردید':esc(nm(e.payer))+' پرداخت کرد'}</div></div>`;
+      head=`<div><b>${esc(e.title)}</b><div class="s">${fd(e.date||'')} · ${e.payer===me?'شما پرداخت کردید':esc(nm(e.payer))+' پرداخت کرد'}</div></div>`;
       right=`<div style="text-align:left;white-space:nowrap"><div>سهم شما: ${tm(my1)}</div><div class="s">از ${tm(e.amount)}</div></div>`;
       if(o)det='<div class="det">'+rw('تاریخ',fd(e.date||''))+rw('مبلغ کل',tm(e.amount))+rw('پرداخت‌کننده',esc(nm(e.payer)))+(e.by?rw('ثبت‌کننده',esc(nm(e.by))):'')+rw('نوع تقسیم',e.custom?'دلخواه':'مساوی')+rw('سهم شما',tm(my1))+rw('تأثیر روی وضع شما',balTxt(net))+'<div class="lab">سهم هر نفر:</div>'+Object.entries(e.shares||{}).map(([i,v])=>rw(esc(nm(i)),tm(v))).join('')+ab+'</div>'}
     return `<div class="row" style="cursor:pointer" data-mid="${esc(e.id)}">${head}<div style="display:flex;align-items:center;gap:6px">${e._pending?'<span class="b pr">⏳</span>':''}${right}${ch}</div></div>`+det}).join(''):'<div class="s">هنوز هزینه‌ای برای شما ثبت نشده.</div>';
   L.innerHTML=h;
-  L.querySelectorAll('button[data-del]').forEach(b=>armed(b,async()=>{const e=all.find(x=>x.id===b.dataset.del);if(!e)return;try{if(e._d)await db.doc('gx_'+cur.gid+'/'+e._d).delete();st.openM=null}catch(x){}}));
+  L.querySelectorAll('button[data-del]').forEach(b=>armed(b,async()=>{const e=all.find(x=>x.id===b.dataset.del);if(!e)return;try{if(e._d)await db.doc('gx_'+cur.gid+'/'+e._d).delete();st.openM=null}catch(x){}},()=>{const e=all.find(x=>x.id===b.dataset.del);return e&&e.t==='pay'?'حذف این پرداخت؟':'حذف «'+esc(e?e.title:'')+'»؟'},'این کار برگشت ندارد.','آره، حذف کن'));
   L.querySelectorAll('button[data-edit]').forEach(b=>b.onclick=()=>{const e=m.exps.find(x=>x.id===b.dataset.edit);if(e)startEdit(e)});
   L.querySelectorAll('.row[data-mid]').forEach(r=>r.onclick=()=>{st.openM=st.openM===r.dataset.mid?null:r.dataset.mid;renderParts()})}
 </script>
